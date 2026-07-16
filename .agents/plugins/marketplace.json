@@ -1,0 +1,20 @@
+{
+  "name": "ks-agent-local",
+  "interface": {
+    "displayName": "Knowledge Space Codex Toolkit"
+  },
+  "plugins": [
+    {
+      "name": "knowledge-space-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/knowledge-space-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

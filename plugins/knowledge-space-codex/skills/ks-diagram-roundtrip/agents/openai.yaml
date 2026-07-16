@@ -1,0 +1,4 @@
+interface:
+  display_name: "KS Diagram Round-trip"
+  short_description: "Safely convert KS backups and Diagramm JSON"
+  default_prompt: "Use $ks-diagram-roundtrip to prepare and validate an isolated KS backup to Diagramm JSON round-trip."

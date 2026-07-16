@@ -1,0 +1,29 @@
+name: Validate plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes zstd
+          python -m pip install --requirement plugins/knowledge-space-codex/requirements.txt
+      - name: Run plugin tests
+        run: python tools/run_plugin_tests.py
+      - name: Verify deterministic portable build
+        run: python tools/test_build_portable_plugin.py
+      - name: Build sanitized release artifact
+        run: python tools/build_portable_plugin.py --output-dir dist
