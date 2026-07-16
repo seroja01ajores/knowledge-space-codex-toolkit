@@ -130,10 +130,10 @@ python3 plugins/knowledge-space-codex/skills/ks-codex/scripts/ks_environment_pre
 
 Репозиторий открыт на GitHub, но плагин пока не входит в общий каталог
 плагинов OpenAI. Другие пользователи устанавливают его из этого GitHub-
-marketplace:
+marketplace. Для воспроизводимой установки ниже зафиксирован проверенный релиз:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref main
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.3.0
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 
@@ -312,10 +312,10 @@ python3 plugins/knowledge-space-codex/skills/ks-codex/scripts/ks_environment_pre
 
 The repository is public on GitHub, but the plugin is not currently part of
 the global OpenAI plugin catalog. Other users install it from this GitHub
-marketplace:
+marketplace. The command below pins the reviewed release for reproducibility:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref main
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.3.0
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 
