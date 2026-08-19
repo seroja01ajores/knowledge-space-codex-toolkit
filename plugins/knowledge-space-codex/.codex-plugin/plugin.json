@@ -1,6 +1,6 @@
 {
   "name": "knowledge-space-codex",
-  "version": "0.3.0+codex.20260716230901",
+  "version": "0.4.0+codex.20260819",
   "description": "Portable Codex plugin for auditing, building, verifying, and diagramming Knowledge Space projects.",
   "author": {
     "name": "TeamValue"
@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "Knowledge Space Codex",
     "shortDescription": "Audit, build, verify, and diagram KS projects safely.",
-    "longDescription": "A stand-agnostic Knowledge Space toolkit for API-first project audits and safe project-scoped edits; course and scratch-project reconstruction; models, classes, indicators, formulas, objects and data; tables, dashboards, publications, Gantt, integrations and BPMS; browser-assisted verification; and an offline, manifest-bound KS backup to Diagramm JSON round-trip. The diagram workflow supports schema 1.2, read-only indicator and formula provenance, non-numeric indicator presentation as attributes, per-class object counts, source-bound change plans, structural validation, cloned-backup packing, and isolated restore/read-back gates. Runtime actions remain available through exact-approved flows, while destructive or live restore actions require a separate target-specific approval.",
+    "longDescription": "A stand-agnostic Knowledge Space toolkit for API-first project audits and safe project-scoped edits; course and scratch-project reconstruction; models, classes, indicators, formulas, objects and data; tables, dashboards, publications, Gantt, integrations and BPMS; browser-assisted verification; session-scoped dynamic IFRAME routing; external web-service contracts; and an offline, manifest-bound KS backup to Diagramm JSON round-trip. The diagram workflow supports schema 1.2, semantic relationship normalization, read-only indicator and formula provenance, non-numeric indicator presentation as attributes, per-class object counts, source-bound change plans, structural validation, cloned-backup packing, and isolated restore/read-back gates. Runtime actions remain available through exact-approved flows, while destructive or live restore actions require a separate target-specific approval.",
     "developerName": "TeamValue",
     "category": "Productivity",
     "capabilities": [
@@ -30,13 +30,18 @@
       "Browser QA",
       "Course Workflows",
       "Backup Round-trip",
-      "Diagram Enrichment"
+      "Diagram Enrichment",
+      "Session-scoped IFRAME Routing",
+      "External Web-service Contracts",
+      "Relationship Normalization"
     ],
     "websiteURL": "https://github.com/seroja01ajores/knowledge-space-codex-toolkit",
     "defaultPrompt": [
       "Audit this KS project safely.",
       "Recreate or verify this KS course project.",
-      "Prepare a KS backup to Diagramm round-trip."
+      "Prepare a KS backup to Diagramm round-trip.",
+      "Configure per-session dynamic IFRAME routing in a KS dashboard.",
+      "Design a multi-user contract between a KS interface and an external service."
     ],
     "brandColor": "#4B3A75"
   }

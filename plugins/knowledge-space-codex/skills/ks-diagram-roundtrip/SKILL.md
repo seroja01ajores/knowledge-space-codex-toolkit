@@ -37,7 +37,9 @@ existing entities by name alone.
 Read `references/roundtrip-contract.md` before building or reviewing artifacts.
 Read `references/supported-fields.md` before deciding whether a Diagramm field
 can become a KS write. Read `references/safe-restore-readback.md` before any live
-upload or restore.
+upload or restore. Read `references/relationship-normalization.md` before
+counting KS relationships, mapping helper closure, or adding formula-dependency
+edges to an enriched diagram.
 
 ## Workflow
 

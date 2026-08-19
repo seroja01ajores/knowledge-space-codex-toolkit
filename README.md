@@ -1,5 +1,7 @@
 # Knowledge Space Codex Toolkit
 
+**Plugin version: `0.4.0`** · [Changelog](CHANGELOG.md)
+
 [Русский](#русская-версия) · [English](#english-version)
 
 ## Русская версия
@@ -24,6 +26,15 @@
 Публичная версия не содержит адреса рабочего стенда KS, UUID реальных
 проектов, клиентских данных, логинов, паролей, токенов, cookie, SSH-ключей или
 реальных резервных копий.
+
+### Новое в 0.4.0
+
+- сессионное переключение URL во встроенном IFRAME без общей записи в
+  конфигурацию дашборда и без перезагрузки страницы;
+- контракт изоляции пользователей между KS/IFRAME и внешним микросервисом;
+- безопасный полный клон проекта через backup/restore с точным read-back;
+- нормализация технической тройки записей связи KS в одну смысловую грань и
+  отдельный слой зависимостей формул.
 
 ### Что даёт плагин
 
@@ -133,7 +144,7 @@ python3 plugins/knowledge-space-codex/skills/ks-codex/scripts/ks_environment_pre
 marketplace. Для воспроизводимой установки ниже зафиксирован проверенный релиз:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.3.0
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.4.0
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 
@@ -201,6 +212,15 @@ KS_PASSWORD=<password>
   релиза;
 - `docs/` — описание архитектуры, приватного дополнения и самообучения.
 
+### Версионирование
+
+- Точная версия пакета хранится в `.codex-plugin/plugin.json` и указана в
+  начале README.
+- Стабильные выпуски получают Git-теги `vMAJOR.MINOR.PATCH`.
+- Пользовательские изменения фиксируются в [CHANGELOG.md](CHANGELOG.md).
+- После обновления marketplace плагин нужно переустановить и открыть новую
+  задачу Codex, чтобы загрузилась новая версия навыков.
+
 ### Проверка и выпуск релиза
 
 ```bash
@@ -242,6 +262,15 @@ The toolkit combines two complementary workflows:
 
 The repository contains no fixed KS host, project UUID, customer data,
 credential, token, cookie or real project backup.
+
+### New in 0.4.0
+
+- Session-scoped URL switching inside an embedded IFRAME without a shared
+  dashboard write or full-page reload.
+- A user-isolation contract between KS/IFRAME and an external microservice.
+- Safe full-project cloning through backup/restore with exact read-back.
+- Normalization of the KS technical relationship triple into one semantic edge,
+  with formula dependencies kept in a separate analytical layer.
 
 ### Why it is useful
 
@@ -315,7 +344,7 @@ the global OpenAI plugin catalog. Other users install it from this GitHub
 marketplace. The command below pins the reviewed release for reproducibility:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.3.0
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.4.0
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 
@@ -377,6 +406,15 @@ private material it learns from. See
   and cloned-backup skill;
 - `tools/build_portable_plugin.py` — deterministic sanitized release builder;
 - `docs/` — architecture, private-overlay and learning guidance.
+
+### Versioning
+
+- The exact package version is stored in `.codex-plugin/plugin.json` and shown
+  at the top of this README.
+- Stable releases use Git tags in the form `vMAJOR.MINOR.PATCH`.
+- [CHANGELOG.md](CHANGELOG.md) records user-visible changes.
+- After a marketplace update, reinstall the plugin and start a new Codex task
+  so the refreshed skills are loaded.
 
 ### Validation and release
 

@@ -88,6 +88,8 @@ When browser access is unavailable, still build and audit through API, but mark 
 - Read `references/payload-examples.md` when you need compact redacted snippets for dashboard events, table constructors, publications, integration conditions, or BPMS task updates.
 - Read `references/project-audit.md` before diagnosing a whole project or empty interfaces.
 - Read `references/dashboard-events.md` before editing dashboards, nested interfaces, widgets, tables, modals, buttons, or Gantt events.
+- Read `references/iframe-session-bridge.md` when a KS interface must switch an embedded IFRAME URL without a dashboard reload and the final URL must remain isolated to one browser session.
+- Read `references/external-web-session-contracts.md` before connecting a KS dashboard or IFRAME to a multi-user external service, queue, or callback API.
 - Read `references/interface-authoring.md` before creating an interface from a design/Figma/template, adding analyst comments/descriptions, or doing layout tasks such as alignment, spacing, overlap repair, and readable table/modal layout.
 - Read `references/bpms-patterns.md` before inspecting or configuring business processes, BPMS tasks, process-triggered integrations, variables, or process history.
 - Read `references/complex-project-patterns.md` before auditing large planning or
@@ -103,6 +105,7 @@ When browser access is unavailable, still build and audit through API, but mark 
 - Read `references/safe-writes.md` before using any create/update/save endpoint.
 - Read `references/safe-patch-workflow.md` before generated patch batches, broad repairs, integration/BPMS runtime actions, destructive operations, imports/exports, or any change where execution mode and approval level matter.
 - Read `references/backups-zstd.md` before inspecting exported KS project backups or `.zst`/zstd-compressed JSON.
+- Read `references/project-clone-restore.md` before cloning a complete KS project through backup/restore or deleting an accidental empty clone.
 - Use `$ks-diagram-roundtrip` for the versioned offline workflow `KS backup -> Diagramm JSON -> dry-run change plan -> cloned backup`; it owns bridge maps, supported/deferred field rules, structural validation, packing, and isolated restore/read-back safety.
 - Read `references/integrations-patterns.md` before working with sources, integrations, operations, integration tables, mappings, or integration-course projects.
 - Read `references/integrations-course-build-spec.md` when recreating the DB integration course from scratch or comparing an integration-course project with the final demo backup.
