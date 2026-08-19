@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KS session IFRAME bridge</title>
+  <style>
+    html, body, iframe { width: 100%; height: 100%; margin: 0; border: 0; }
+    body { overflow: hidden; background: #fff; color: #444; font: 14px/1.4 sans-serif; }
+    #status { box-sizing: border-box; padding: 16px; }
+    #target { display: none; }
+  </style>
+</head>
+<body>
+  <div id="status">Waiting for a page selection...</div>
+  <iframe id="target" title="Embedded application" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  <script>
+    (function () {
+      "use strict";
+
+      var STORAGE_KEY = "dashboardVariables";
+      var EVENT_TAG = "iframe_target_url";
+      var PROJECT_UUID = "";
+      var ALLOWED_HOSTS = new Set(["example.test"]);
+      var ALLOWED_PATH_PREFIXES = ["/"];
+      var POLL_MS = 250;
+      var target = document.getElementById("target");
+      var status = document.getElementById("status");
+      var currentUrl = "";
+
+      function walk(value, output, depth) {
+        if (depth > 10 || value === null || value === undefined) return;
+        if (Array.isArray(value)) {
+          value.forEach(function (item) { walk(item, output, depth + 1); });
+          return;
+        }
+        if (typeof value === "object") {
+          output.push(value);
+          Object.keys(value).forEach(function (key) { walk(value[key], output, depth + 1); });
+        }
+      }
+
+      function tagMatches(value) {
+        if (Array.isArray(value)) return value.some(tagMatches);
+        if (typeof value !== "string") return false;
+        return value === EVENT_TAG || value.split(/[\s,]+/).indexOf(EVENT_TAG) !== -1;
+      }
+
+      function recordHasTag(record) {
+        return tagMatches(record.tags) || tagMatches(record.tag) ||
+          tagMatches(record.sendEntityTags) ||
+          tagMatches(record.data && record.data.tags) ||
+          tagMatches(record.entity && record.entity.tags);
+      }
+
+      function projectMatches(record) {
+        if (!PROJECT_UUID) return true;
+        var value = record.projectUuid || record.projectUUID ||
+          (record.data && (record.data.projectUuid || record.data.projectUUID));
+        return !value || value === PROJECT_UUID;
+      }
+
+      function typeMatches(record) {
+        var values = [record.type, record.eventType, record.entityType,
+          record.data && record.data.type, record.entity && record.entity.type]
+          .filter(function (value) { return typeof value === "string"; });
+        return values.length === 0 || values.some(function (value) {
+          return value === "getString" || value === "string";
+        });
+      }
+
+      function findHttpsString(value, depth) {
+        if (depth > 8 || value === null || value === undefined) return null;
+        if (typeof value === "string" && value.indexOf("https://") === 0) return value;
+        if (Array.isArray(value)) {
+          for (var i = 0; i < value.length; i += 1) {
+            var fromArray = findHttpsString(value[i], depth + 1);
+            if (fromArray) return fromArray;
+          }
+          return null;
+        }
+        if (typeof value === "object") {
+          var preferred = ["value", "additionalValue", "url", "data", "entity", "sendEntityValue"];
+          for (var j = 0; j < preferred.length; j += 1) {
+            if (Object.prototype.hasOwnProperty.call(value, preferred[j])) {
+              var selected = findHttpsString(value[preferred[j]], depth + 1);
+              if (selected) return selected;
+            }
+          }
+          var keys = Object.keys(value);
+          for (var k = 0; k < keys.length; k += 1) {
+            var found = findHttpsString(value[keys[k]], depth + 1);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+
+      function validateUrl(raw) {
+        var parsed;
+        try { parsed = new URL(raw); } catch (error) { return null; }
+        if (parsed.protocol !== "https:" || !ALLOWED_HOSTS.has(parsed.hostname)) return null;
+        if (!ALLOWED_PATH_PREFIXES.some(function (prefix) {
+          return parsed.pathname.indexOf(prefix) === 0;
+        })) return null;
+        return parsed.href;
+      }
+
+      function latestUrl() {
+        var raw = sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        var parsed;
+        try { parsed = JSON.parse(raw); } catch (error) { return null; }
+        var records = [];
+        walk(parsed, records, 0);
+        var candidates = records.filter(function (record) {
+          return recordHasTag(record) && projectMatches(record) && typeMatches(record);
+        }).map(function (record, index) {
+          var rawUrl = findHttpsString(record, 0);
+          var updatedAt = Date.parse(record.updatedAt || record.updated_at || record.time || "");
+          return { index: index, updatedAt: Number.isFinite(updatedAt) ? updatedAt : 0,
+            url: rawUrl ? validateUrl(rawUrl) : null };
+        }).filter(function (candidate) { return candidate.url; })
+          .sort(function (left, right) {
+            return left.updatedAt - right.updatedAt || left.index - right.index;
+          });
+        return candidates.length ? candidates[candidates.length - 1].url : null;
+      }
+
+      function sync() {
+        var nextUrl = latestUrl();
+        if (!nextUrl || nextUrl === currentUrl) return;
+        currentUrl = nextUrl;
+        target.src = nextUrl;
+        target.style.display = "block";
+        status.style.display = "none";
+      }
+
+      sync();
+      window.setInterval(sync, POLL_MS);
+    }());
+  </script>
+</body>
+</html>

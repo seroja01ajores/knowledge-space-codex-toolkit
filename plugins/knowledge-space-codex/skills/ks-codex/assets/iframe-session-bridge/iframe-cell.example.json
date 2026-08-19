@@ -1,0 +1,15 @@
+{
+  "_comment": "Replace the srcdoc placeholder with the complete JSON-escaped iframe-bridge.html contents.",
+  "type": "IFRAME",
+  "hide": false,
+  "iframeSrc": "about:blank",
+  "iframeCustomEventNames": "",
+  "iframeAttributes": [
+    {
+      "key": "srcdoc",
+      "value": "<iframe-bridge.html>"
+    }
+  ],
+  "iframeParams": [],
+  "iframeQueries": []
+}
