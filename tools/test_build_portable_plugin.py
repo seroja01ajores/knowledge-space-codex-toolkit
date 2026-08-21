@@ -184,7 +184,7 @@ class PortablePluginBuilderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             readme = Path(temp_dir) / "README.md"
             readme.write_text(
-                "codex plugin marketplace add owner/repo --ref v0.5.0\n",
+                "codex plugin marketplace add owner/repo --ref v0.4.0\n",
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(
