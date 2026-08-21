@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://teamvalue.invalid/schemas/ks-task-handoff.schema.json",
+  "title": "KS compact task handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "formatVersion",
+    "planSha256",
+    "requestSha256",
+    "contextPackSha256",
+    "stateSha256",
+    "completedPhaseId",
+    "phaseStatus",
+    "nextPhaseId",
+    "phaseExpectedOutputs",
+    "target",
+    "facts",
+    "unknowns",
+    "contradictions",
+    "approvals",
+    "artifacts",
+    "verification",
+    "nextAction",
+    "safety",
+    "handoffSha256"
+  ],
+  "properties": {
+    "format": {
+      "const": "teamvalue.ks-task-handoff"
+    },
+    "formatVersion": {
+      "const": "1.0"
+    },
+    "planSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "parentPlanSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "requestSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "contextPackSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "stateSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "handoffSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "completedPhaseId": {
+      "$ref": "#/$defs/slug"
+    },
+    "phaseStatus": {
+      "enum": [
+        "completed",
+        "partial",
+        "blocked"
+      ]
+    },
+    "nextPhaseId": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/slug"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "phaseExpectedOutputs": {
+      "$ref": "#/$defs/textArray"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standAlias",
+        "projectUuid",
+        "projectUuidStatus"
+      ],
+      "properties": {
+        "standAlias": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "projectUuid": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "projectUuidStatus": {
+          "enum": [
+            "confirmed",
+            "unconfirmed",
+            "not-applicable"
+          ]
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "entityType",
+          "entityUuid",
+          "statement",
+          "evidenceRefs"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/slug"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "inferred",
+              "missing",
+              "contradicted"
+            ]
+          },
+          "entityType": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 128
+          },
+          "entityUuid": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/uuid"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "statement": {
+            "$ref": "#/$defs/text"
+          },
+          "evidenceRefs": {
+            "$ref": "#/$defs/refArray"
+          }
+        }
+      }
+    },
+    "unknowns": {
+      "$ref": "#/$defs/textArray"
+    },
+    "contradictions": {
+      "$ref": "#/$defs/textArray"
+    },
+    "approvals": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "risk",
+          "status",
+          "scope",
+          "evidenceRefs"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/slug"
+          },
+          "risk": {
+            "enum": [
+              "read_only",
+              "local_artifact_write",
+              "project_write",
+              "external_or_runtime",
+              "destructive_or_global",
+              "server_or_db"
+            ]
+          },
+          "status": {
+            "enum": [
+              "not-requested",
+              "approved",
+              "denied",
+              "expired"
+            ]
+          },
+          "scope": {
+            "$ref": "#/$defs/text"
+          },
+          "evidenceRefs": {
+            "$ref": "#/$defs/refArray"
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "path",
+          "sha256",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/slug"
+          },
+          "kind": {
+            "$ref": "#/$defs/slug"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "status": {
+            "enum": [
+              "created",
+              "validated",
+              "unverified"
+            ]
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "evidenceRefs",
+          "waiverReason"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/slug"
+          },
+          "kind": {
+            "$ref": "#/$defs/slug"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "pending",
+              "waived"
+            ]
+          },
+          "evidenceRefs": {
+            "$ref": "#/$defs/refArray"
+          },
+          "waiverReason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2048
+          }
+        }
+      }
+    },
+    "nextAction": {
+      "$ref": "#/$defs/text"
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "planningOnly",
+        "executionAuthorized",
+        "containsRawResponses",
+        "sensitiveValuesPresent",
+        "actualEffectStillRequiresClassification"
+      ],
+      "properties": {
+        "planningOnly": {
+          "const": true
+        },
+        "executionAuthorized": {
+          "const": false
+        },
+        "containsRawResponses": {
+          "const": false
+        },
+        "sensitiveValuesPresent": {
+          "const": false
+        },
+        "actualEffectStillRequiresClassification": {
+          "const": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "textArray": {
+      "type": "array",
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/text"
+      }
+    },
+    "refArray": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+      }
+    }
+  }
+}

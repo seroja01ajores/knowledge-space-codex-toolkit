@@ -1,7 +1,5 @@
 # Knowledge Space Codex Toolkit
 
-**Plugin version: `0.4.0`** · [Changelog](CHANGELOG.md)
-
 [Русский](#русская-версия) · [English](#english-version)
 
 ## Русская версия
@@ -27,20 +25,18 @@
 проектов, клиентских данных, логинов, паролей, токенов, cookie, SSH-ключей или
 реальных резервных копий.
 
-### Новое в 0.4.0
-
-- сессионное переключение URL во встроенном IFRAME без общей записи в
-  конфигурацию дашборда и без перезагрузки страницы;
-- контракт изоляции пользователей между KS/IFRAME и внешним микросервисом;
-- безопасный полный клон проекта через backup/restore с точным read-back;
-- нормализация технической тройки записей связи KS в одну смысловую грань и
-  отдельный слой зависимостей формул.
+Текущая релизная линия: **v0.5.0**.
 
 ### Что даёт плагин
 
 | Задача | Что делает плагин |
 | --- | --- |
 | Разобраться в незнакомом проекте KS | Создаёт снимок через API в режиме чтения и проверяет структуру и доступные артефакты интерфейса |
+| Выполнить задачу, связанную с несколькими разделами KS | Строит единый план без ограничения числа доменов и загружает подробные инструкции по фазам |
+| Решить задачу, которой раньше не было в навыке | Начинает с безопасного Discovery, находит фактические сущности и эффекты, затем формирует новый проверяемый маршрут |
+| Найти ранее проверенное решение | Ищет компактные карточки опыта в локальном приватном индексе без отправки данных во внешний сервис |
+| Разделить фильтры пользователей во встроенном iframe | Разделяет состояние браузера, KS и внешнего сервиса, проектирует сессионный контракт и проверку двух независимых сессий |
+| Построить карту влияния или отчёт о здоровье проекта | Собирает source-bound lineage, события интерфейса, приоритетные дефекты и безопасные варианты исправления |
 | Восстановить учебный или эталонный проект | Ведёт работу в отдельном тестовом проекте и требует явной проверки результата |
 | Исправить модели, классы, дашборды или публикации | Сначала строит dry-run план, точно связывает его с проектом, выполняет узкое изменение и машинное чтение результата |
 | Работать с интеграциями и BPMS | Использует отдельный контур точного подтверждения; функциональность не запрещена полностью, но не запускается случайно |
@@ -63,6 +59,38 @@
 
 Рекомендуемый первый этап всегда работает только на чтение. Изменения не
 следуют автоматически из результатов аудита.
+
+### Адаптивная модель работы
+
+- **Direct** применяется, когда сущность, цель, проект и проверка уже понятны.
+- **Coordinated** применяется для нескольких зависимых областей, runtime,
+  подтверждений, возобновления плана или аудиторского следа.
+- **Discovery** применяется для неизвестной сущности или эффекта и остаётся на
+  чтении, пока не определены endpoint, payload, цель и требуемый уровень
+  подтверждения.
+
+Codex интерпретирует естественный язык самостоятельно. Скрипты не угадывают
+намерение по ключевым словам: они проверяют выбранные capability ID,
+зависимости, реальные endpoint/payload и бизнес-эффект. Численного ограничения
+на количество областей нет; подробные материалы загружаются только для текущей
+фазы.
+
+### Что добавлено в v0.5.0
+
+- Адаптивный context pack хранит карту всей задачи, но включает подробные
+  ресурсы только текущей фазы и проверяет их хеши.
+- Компактный handoff переносит подтверждённые факты, неизвестные, артефакты и
+  границы согласований без сырых ответов и секретов.
+- Карточки опыта версии 1.1 получили применимость, свежесть, отклонённые
+  гипотезы, supersession и отдельные проверки перед публикацией.
+- Execution receipt связывает план с отчётом исполнителя и хешами read-before,
+  ответа, read-back и машинных проверок, но не выдаёт разрешение на действие.
+- Discovery и многодоменный план работают без словарного NLP-роутера и без
+  численного ограничения областей.
+
+Полный контракт и релизная матрица описаны в
+[docs/release-0.5.md](docs/release-0.5.md), изменения версий — в
+[CHANGELOG.md](CHANGELOG.md).
 
 ### Работа с диаграммами и резервными копиями
 
@@ -144,7 +172,7 @@ python3 plugins/knowledge-space-codex/skills/ks-codex/scripts/ks_environment_pre
 marketplace. Для воспроизводимой установки ниже зафиксирован проверенный релиз:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.4.0
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.5.0
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 
@@ -210,16 +238,9 @@ KS_PASSWORD=<password>
   преобразования диаграммы и клонированной резервной копии;
 - `tools/build_portable_plugin.py` — воспроизводимый сборщик обезличенного
   релиза;
+- `CHANGELOG.md` и `docs/release-0.5.md` — история изменений и проверяемый
+  контракт релиза;
 - `docs/` — описание архитектуры, приватного дополнения и самообучения.
-
-### Версионирование
-
-- Точная версия пакета хранится в `.codex-plugin/plugin.json` и указана в
-  начале README.
-- Стабильные выпуски получают Git-теги `vMAJOR.MINOR.PATCH`.
-- Пользовательские изменения фиксируются в [CHANGELOG.md](CHANGELOG.md).
-- После обновления marketplace плагин нужно переустановить и открыть новую
-  задачу Codex, чтобы загрузилась новая версия навыков.
 
 ### Проверка и выпуск релиза
 
@@ -263,26 +284,54 @@ The toolkit combines two complementary workflows:
 The repository contains no fixed KS host, project UUID, customer data,
 credential, token, cookie or real project backup.
 
-### New in 0.4.0
-
-- Session-scoped URL switching inside an embedded IFRAME without a shared
-  dashboard write or full-page reload.
-- A user-isolation contract between KS/IFRAME and an external microservice.
-- Safe full-project cloning through backup/restore with exact read-back.
-- Normalization of the KS technical relationship triple into one semantic edge,
-  with formula dependencies kept in a separate analytical layer.
+Current release line: **v0.5.0**.
 
 ### Why it is useful
 
 | Task | Toolkit support |
 | --- | --- |
 | Understand an unfamiliar KS project | Read-only API snapshot plus structural and UI artifact audits |
+| Solve a task spanning several KS areas | Build one unbounded domain plan and load detailed guidance phase by phase |
+| Solve a task not previously covered by the skill | Start with safe Discovery, identify actual entities and effects, then produce a verifiable new route |
+| Reuse a verified prior solution | Search compact experience cards in a local private index without an external service |
+| Isolate filters for users inside an iframe | Separate browser, KS and external-service state, design a session contract and verify two independent sessions |
+| Build an impact map or project health report | Produce source-bound lineage, interface event flow, prioritized defects and safe repair options |
 | Recreate a training or reference project | Isolated scratch-project workflow with explicit verification |
 | Repair classes, models, dashboards or publications | Dry-run plan, exact project binding, narrow writes and machine read-back |
 | Work with integrations or BPMS | Separate exact-approved runtime gate; no blanket feature ban |
 | See a large project as a diagram | Enriched Diagramm JSON with classes, relations, KS fields, indicators, formulas and object counts |
 | Return diagram edits to KS | Source-hash-bound structural diff and cloned-backup build; no in-place overwrite |
 | Learn an undocumented UI action | Redacted capture → compare → normalize → test → promote workflow |
+
+### Adaptive operating model
+
+- **Direct** handles a clear entity, outcome, project and verification target.
+- **Coordinated** handles dependent areas, runtime effects, approvals, resume or
+  audit trails.
+- **Discovery** handles an unknown entity or effect and remains read-only until
+  the endpoint, payload, target and approval boundary are known.
+
+Codex interprets natural language. Scripts validate selected capability IDs,
+dependencies, actual endpoints, payloads and business effects rather than
+guessing intent from keywords. There is no numeric area cap; detailed
+references load only for the active phase.
+
+### What v0.5.0 adds
+
+- An adaptive context pack retains the complete task map while including
+  detailed resources only for the active phase and binding them by hash.
+- A compact handoff carries verified facts, unknowns, artifacts and approval
+  boundaries without raw responses or secrets.
+- Knowledge cards 1.1 add applicability, freshness, rejected hypotheses,
+  supersession and independent promotion checks.
+- An execution receipt binds a plan to executor reports and hashes of
+  read-before, response, read-back and machine-check artifacts without granting
+  permission.
+- Discovery and multi-domain planning use neither a keyword NLP router nor a
+  numeric area limit.
+
+See [docs/release-0.5.md](docs/release-0.5.md) for the release contract and
+[CHANGELOG.md](CHANGELOG.md) for version history.
 
 ### Safety by design
 
@@ -344,7 +393,7 @@ the global OpenAI plugin catalog. Other users install it from this GitHub
 marketplace. The command below pins the reviewed release for reproducibility:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.4.0
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.5.0
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 
@@ -405,16 +454,9 @@ private material it learns from. See
 - `plugins/knowledge-space-codex/skills/ks-diagram-roundtrip/` — offline diagram
   and cloned-backup skill;
 - `tools/build_portable_plugin.py` — deterministic sanitized release builder;
+- `CHANGELOG.md` and `docs/release-0.5.md` — version history and verifiable
+  release contract;
 - `docs/` — architecture, private-overlay and learning guidance.
-
-### Versioning
-
-- The exact package version is stored in `.codex-plugin/plugin.json` and shown
-  at the top of this README.
-- Stable releases use Git tags in the form `vMAJOR.MINOR.PATCH`.
-- [CHANGELOG.md](CHANGELOG.md) records user-visible changes.
-- After a marketplace update, reinstall the plugin and start a new Codex task
-  so the refreshed skills are loaded.
 
 ### Validation and release
 

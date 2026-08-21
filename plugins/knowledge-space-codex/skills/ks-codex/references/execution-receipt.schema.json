@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://teamvalue.invalid/schemas/ks-execution-receipt.schema.json",
+  "title": "KS execution evidence receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "formatVersion",
+    "sourceKind",
+    "planSha256",
+    "reportSha256",
+    "generatedAt",
+    "mode",
+    "executeFlag",
+    "target",
+    "lintBlockingFindings",
+    "overallStatus",
+    "operations",
+    "safety",
+    "receiptSha256"
+  ],
+  "properties": {
+    "format": {
+      "const": "teamvalue.ks-execution-receipt"
+    },
+    "formatVersion": {
+      "const": "1.0"
+    },
+    "sourceKind": {
+      "enum": [
+        "safe-patch",
+        "approved-runtime"
+      ]
+    },
+    "planSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "reportSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "receiptSha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "enum": [
+        "dry_run",
+        "execute_project_writes",
+        "approved_runtime",
+        "approved_destructive",
+        "server_maintenance"
+      ]
+    },
+    "executeFlag": {
+      "type": "boolean"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "standSha256",
+        "projectUuid"
+      ],
+      "properties": {
+        "standSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "projectUuid": {
+          "type": "string"
+        }
+      }
+    },
+    "lintBlockingFindings": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "overallStatus": {
+      "enum": [
+        "dry-run",
+        "dry-run-with-findings",
+        "completed",
+        "incomplete",
+        "effect-unknown"
+      ]
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "endpoint",
+          "risk",
+          "status",
+          "issueCount",
+          "verification",
+          "verificationWaiverSha256",
+          "artifacts"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/slug"
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "risk": {
+            "enum": [
+              "read_only",
+              "project_write",
+              "external_or_runtime",
+              "destructive_or_global",
+              "server_or_db",
+              "unknown"
+            ]
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "denied",
+              "deferred",
+              "failed",
+              "effect_unknown",
+              "not_executed_after_failure",
+              "executed_read_only",
+              "executed_project_write",
+              "executed_runtime"
+            ]
+          },
+          "issueCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "verification": {
+            "enum": [
+              "passed",
+              "failed",
+              "waived",
+              "not-required",
+              "readback-without-machine-check",
+              "effect-unknown",
+              "not-run"
+            ]
+          },
+          "verificationWaiverSha256": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/sha256"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "role",
+                "path",
+                "sha256",
+                "bytes"
+              ],
+              "properties": {
+                "role": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "$ref": "#/$defs/sha256"
+                },
+                "bytes": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "checksValid": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authorizesExecution",
+        "authorizesRetry",
+        "carriesApproval",
+        "effectUnknownRequiresExplicitResolution",
+        "actualEffectClassificationRemainsAuthoritative"
+      ],
+      "properties": {
+        "authorizesExecution": {
+          "const": false
+        },
+        "authorizesRetry": {
+          "const": false
+        },
+        "carriesApproval": {
+          "const": false
+        },
+        "effectUnknownRequiresExplicitResolution": {
+          "const": true
+        },
+        "actualEffectClassificationRemainsAuthoritative": {
+          "const": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

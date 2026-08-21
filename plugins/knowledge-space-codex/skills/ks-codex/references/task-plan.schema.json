@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://teamvalue.invalid/schemas/ks-task-plan.schema.json",
+  "title": "KS coordinated task plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "formatVersion",
+    "requestSha256",
+    "mode",
+    "phase",
+    "capabilities",
+    "phases",
+    "contextPolicy",
+    "knowledge",
+    "safety"
+  ],
+  "properties": {
+    "format": {
+      "const": "teamvalue.ks-task-plan"
+    },
+    "formatVersion": {
+      "const": "2.0"
+    },
+    "requestSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "parentPlanSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "mode": {
+      "const": "coordinated"
+    },
+    "phase": {
+      "enum": [
+        "analysis",
+        "change",
+        "runtime",
+        "verification"
+      ]
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "operation",
+          "selection",
+          "reasons",
+          "risk"
+        ]
+      }
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "objective",
+          "capabilities",
+          "references",
+          "scripts",
+          "gates",
+          "outputs",
+          "planningOnly"
+        ]
+      }
+    },
+    "contextPolicy": {
+      "type": "object"
+    },
+    "knowledge": {
+      "type": "object"
+    },
+    "safety": {
+      "type": "object",
+      "required": [
+        "planningOnly",
+        "executionAuthorized",
+        "liveKsCalled",
+        "requiredGate",
+        "requiresEndpointEffectClassification"
+      ]
+    }
+  }
+}

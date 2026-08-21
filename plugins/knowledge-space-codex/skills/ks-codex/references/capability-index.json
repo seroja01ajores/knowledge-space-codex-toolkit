@@ -1,0 +1,713 @@
+{
+  "format": "teamvalue.ks-capability-index",
+  "formatVersion": "2.0",
+  "riskOrder": [
+    "read_only",
+    "local_artifact_write",
+    "project_write",
+    "external_or_runtime",
+    "destructive_or_global",
+    "server_or_db"
+  ],
+  "riskGates": {
+    "read_only": {
+      "gate": "project-scoped read-only",
+      "references": [],
+      "scripts": []
+    },
+    "local_artifact_write": {
+      "gate": "explicit external output or private knowledge root",
+      "references": [
+        "knowledge-card.schema.json"
+      ],
+      "scripts": [
+        "ks_knowledge.py"
+      ]
+    },
+    "project_write": {
+      "gate": "dry run plus exact project-scoped approval",
+      "references": [
+        "safe-writes.md",
+        "safe-patch-workflow.md"
+      ],
+      "scripts": [
+        "ks_safe_patch_lint.py",
+        "ks_safe_patch_execute.py"
+      ]
+    },
+    "external_or_runtime": {
+      "gate": "exact runtime operation approval plus verification",
+      "references": [
+        "safe-patch-workflow.md"
+      ],
+      "scripts": [
+        "ks_approved_runtime_execute.py"
+      ]
+    },
+    "destructive_or_global": {
+      "gate": "separate target-specific destructive approval",
+      "references": [
+        "safe-patch-workflow.md",
+        "backups-zstd.md"
+      ],
+      "scripts": [
+        "ks_safe_patch_lint.py"
+      ]
+    },
+    "server_or_db": {
+      "gate": "explicit server-maintenance approval",
+      "references": [],
+      "scripts": []
+    }
+  },
+  "areas": [
+    {
+      "id": "environment-project",
+      "order": 10,
+      "title": "Environment and project scope",
+      "purpose": "Bind work to the correct stand, project, session, and API surface.",
+      "requires": [],
+      "oftenWith": [
+        "browser-diagnostics"
+      ],
+      "references": [
+        "api-client-patterns.md",
+        "api-map.md",
+        "project-audit.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_environment_preflight.py",
+            "ks_readonly_audit_runner.py",
+            "ks_smoke_check.py"
+          ],
+          "outputs": [
+            "project-bound preflight",
+            "read-only project snapshot"
+          ],
+          "verification": [
+            "project UUID confirmed",
+            "API errors unwrapped"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "model-data",
+      "order": 20,
+      "title": "Models and stored data",
+      "purpose": "Inspect or change models, datasets, classes, objects, relations, and values.",
+      "requires": [
+        "environment-project"
+      ],
+      "oftenWith": [
+        "indicators-formulas",
+        "tables"
+      ],
+      "references": [
+        "project-audit.md",
+        "api-map.md",
+        "ui-observed-builder.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_readonly_audit_runner.py"
+          ],
+          "outputs": [
+            "UUID-bound model and data inventory"
+          ],
+          "verification": [
+            "referenced entities exist"
+          ]
+        },
+        {
+          "id": "change",
+          "risk": "project_write",
+          "scripts": [],
+          "outputs": [
+            "project-scoped model or data change plan"
+          ],
+          "verification": [
+            "API read-back matches intended state"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indicators-formulas",
+      "order": 30,
+      "title": "Indicators and formulas",
+      "purpose": "Inspect or change indicators, dimensions, formulas, and calculations.",
+      "requires": [
+        "environment-project",
+        "model-data"
+      ],
+      "oftenWith": [
+        "tables",
+        "integrations"
+      ],
+      "references": [
+        "api-map.md",
+        "payload-examples.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_readonly_audit_runner.py"
+          ],
+          "outputs": [
+            "indicator and formula dependency map"
+          ],
+          "verification": [
+            "formula references resolve"
+          ]
+        },
+        {
+          "id": "change",
+          "risk": "project_write",
+          "scripts": [],
+          "outputs": [
+            "indicator or formula patch plan"
+          ],
+          "verification": [
+            "definition read-back matches"
+          ]
+        },
+        {
+          "id": "recalculate",
+          "risk": "external_or_runtime",
+          "scripts": [
+            "ks_approved_runtime_execute.py"
+          ],
+          "outputs": [
+            "approved recalculation result"
+          ],
+          "verification": [
+            "calculated values read back"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tables",
+      "order": 40,
+      "title": "Data tables",
+      "purpose": "Inspect or change constructors, rows, columns, filters, and data references.",
+      "requires": [
+        "environment-project",
+        "model-data"
+      ],
+      "oftenWith": [
+        "indicators-formulas",
+        "dashboard-ui"
+      ],
+      "references": [
+        "project-audit.md",
+        "dashboard-events.md",
+        "payload-examples.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_table_audit.py"
+          ],
+          "outputs": [
+            "table constructor reference audit"
+          ],
+          "verification": [
+            "row and column references resolve"
+          ]
+        },
+        {
+          "id": "change",
+          "risk": "project_write",
+          "scripts": [],
+          "outputs": [
+            "table constructor patch plan"
+          ],
+          "verification": [
+            "constructor read-back and rendered table checked"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dashboard-ui",
+      "order": 50,
+      "title": "Dashboards and interfaces",
+      "purpose": "Inspect or change cells, layout, events, widgets, buttons, modals, and nested UI.",
+      "requires": [
+        "environment-project"
+      ],
+      "oftenWith": [
+        "tables",
+        "browser-diagnostics",
+        "publications-gantt"
+      ],
+      "references": [
+        "dashboard-events.md",
+        "interface-authoring.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_dashboard_cell_report.py"
+          ],
+          "outputs": [
+            "dashboard cell and event report"
+          ],
+          "verification": [
+            "cell UUIDs and references resolve"
+          ]
+        },
+        {
+          "id": "change",
+          "risk": "project_write",
+          "scripts": [
+            "ks_dashboard_layout_plan.py"
+          ],
+          "outputs": [
+            "dashboard patch or layout plan"
+          ],
+          "verification": [
+            "API read-back and material browser behavior checked"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "publications-gantt",
+      "order": 60,
+      "title": "Publications and Gantt",
+      "purpose": "Inspect or change application trees, visibility, hidden dependencies, and Gantt behavior.",
+      "requires": [
+        "environment-project",
+        "dashboard-ui"
+      ],
+      "oftenWith": [
+        "browser-diagnostics"
+      ],
+      "references": [
+        "dashboard-events.md",
+        "payload-examples.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "publication or Gantt dependency inventory"
+          ],
+          "verification": [
+            "tree and dashboard references resolve"
+          ]
+        },
+        {
+          "id": "change",
+          "risk": "project_write",
+          "scripts": [
+            "ks_publication_patch_plan.py"
+          ],
+          "outputs": [
+            "publication or Gantt patch plan"
+          ],
+          "verification": [
+            "published route and browser behavior checked"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "integrations",
+      "order": 70,
+      "title": "Integrations",
+      "purpose": "Inspect or change sources, operations, mappings, conditions, and integration tables.",
+      "requires": [
+        "environment-project"
+      ],
+      "oftenWith": [
+        "model-data",
+        "indicators-formulas",
+        "bpms"
+      ],
+      "references": [
+        "integrations-patterns.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_integration_readonly_audit.py"
+          ],
+          "outputs": [
+            "integration dependency and configuration audit"
+          ],
+          "verification": [
+            "operation-scoped references resolve"
+          ]
+        },
+        {
+          "id": "change",
+          "risk": "project_write",
+          "scripts": [],
+          "outputs": [
+            "integration configuration patch plan"
+          ],
+          "verification": [
+            "configuration read-back matches"
+          ]
+        },
+        {
+          "id": "check-connection",
+          "risk": "external_or_runtime",
+          "scripts": [
+            "ks_approved_runtime_execute.py"
+          ],
+          "outputs": [
+            "approved connection-check result"
+          ],
+          "verification": [
+            "result recorded without leaking credentials"
+          ]
+        },
+        {
+          "id": "run",
+          "risk": "external_or_runtime",
+          "scripts": [
+            "ks_approved_runtime_execute.py"
+          ],
+          "outputs": [
+            "approved integration-run result"
+          ],
+          "verification": [
+            "target data or operation state read back"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bpms",
+      "order": 80,
+      "title": "BPMS",
+      "purpose": "Inspect or change processes, tasks, variables, history, and process-triggered integrations.",
+      "requires": [
+        "environment-project"
+      ],
+      "oftenWith": [
+        "integrations",
+        "model-data"
+      ],
+      "references": [
+        "bpms-patterns.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_bpms_audit.py"
+          ],
+          "outputs": [
+            "BPMS dependency and run-safety audit"
+          ],
+          "verification": [
+            "process and task references resolve"
+          ]
+        },
+        {
+          "id": "change",
+          "risk": "project_write",
+          "scripts": [],
+          "outputs": [
+            "BPMS configuration patch plan"
+          ],
+          "verification": [
+            "configuration read-back matches"
+          ]
+        },
+        {
+          "id": "run",
+          "risk": "external_or_runtime",
+          "scripts": [
+            "ks_approved_runtime_execute.py"
+          ],
+          "outputs": [
+            "approved process or task result"
+          ],
+          "verification": [
+            "process history or task state read back"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "browser-diagnostics",
+      "order": 90,
+      "title": "Browser diagnostics",
+      "purpose": "Inspect frontend-only failures, cache, WebSocket, network, and rendered behavior.",
+      "requires": [
+        "environment-project"
+      ],
+      "oftenWith": [
+        "dashboard-ui",
+        "publications-gantt"
+      ],
+      "references": [
+        "devtools-diagnostics.md",
+        "ui-network-capture.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "redacted browser evidence"
+          ],
+          "verification": [
+            "DOM, console, and network evidence separated from API state"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "course-reconstruction",
+      "order": 100,
+      "title": "Course reconstruction",
+      "purpose": "Audit, compare, build, or repair isolated base, advanced, and integration course projects.",
+      "requires": [
+        "environment-project"
+      ],
+      "oftenWith": [
+        "model-data",
+        "tables",
+        "dashboard-ui",
+        "integrations"
+      ],
+      "references": [
+        "course-project-workflows.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [
+            "ks_readonly_audit_runner.py",
+            "ks_project_diff.py"
+          ],
+          "outputs": [
+            "course-to-project gap report"
+          ],
+          "verification": [
+            "actual project compared with target specification"
+          ]
+        },
+        {
+          "id": "build",
+          "risk": "project_write",
+          "scripts": [],
+          "outputs": [
+            "isolated course reconstruction plan"
+          ],
+          "verification": [
+            "API state and required learning workflow checked"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backup-roundtrip",
+      "order": 110,
+      "title": "Backup and Diagramm round-trip",
+      "purpose": "Inspect backups, prepare structural Diagramm changes, and build cloned backup artifacts.",
+      "requires": [],
+      "oftenWith": [
+        "model-data",
+        "dashboard-ui"
+      ],
+      "references": [
+        "backups-zstd.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "offline backup inventory"
+          ],
+          "verification": [
+            "backup structure validated"
+          ]
+        },
+        {
+          "id": "build-clone",
+          "risk": "local_artifact_write",
+          "scripts": [],
+          "outputs": [
+            "validated cloned backup artifact"
+          ],
+          "verification": [
+            "artifact remains source-bound and structurally valid"
+          ]
+        },
+        {
+          "id": "restore-scratch",
+          "risk": "destructive_or_global",
+          "scripts": [],
+          "outputs": [
+            "exact-approved isolated restore result"
+          ],
+          "verification": [
+            "restored scratch project read back separately"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "capability-discovery",
+      "order": 115,
+      "title": "Capability discovery",
+      "purpose": "Investigate work not yet represented by a stable capability without interpreting user wording or inheriting write permission.",
+      "requires": [],
+      "oftenWith": [
+        "environment-project",
+        "browser-diagnostics",
+        "knowledge-learning"
+      ],
+      "references": [
+        "adaptive-context-packs.md",
+        "use-case-patterns.md"
+      ],
+      "operations": [
+        {
+          "id": "inspect-api",
+          "risk": "read_only",
+          "references": [
+            "api-map.md",
+            "openapi-endpoints.md"
+          ],
+          "scripts": [
+            "ks_environment_preflight.py"
+          ],
+          "outputs": [
+            "candidate endpoint, entity, and effect evidence"
+          ],
+          "verification": [
+            "project scope and observed API behavior are evidenced"
+          ]
+        },
+        {
+          "id": "inspect-ui-network",
+          "risk": "read_only",
+          "references": [
+            "devtools-diagnostics.md",
+            "ui-network-capture.md"
+          ],
+          "scripts": [],
+          "outputs": [
+            "redacted UI-to-API evidence"
+          ],
+          "verification": [
+            "request chain and material browser behavior are separated"
+          ]
+        },
+        {
+          "id": "inspect-server-readonly",
+          "risk": "server_or_db",
+          "references": [],
+          "scripts": [],
+          "outputs": [
+            "read-only server observation after API and UI evidence proved insufficient"
+          ],
+          "verification": [
+            "server access and observation scope are explicitly evidenced"
+          ]
+        },
+        {
+          "id": "record-gap",
+          "risk": "local_artifact_write",
+          "references": [
+            "knowledge-card.schema.json",
+            "self-learning.md"
+          ],
+          "scripts": [
+            "ks_knowledge.py"
+          ],
+          "outputs": [
+            "redacted private candidate capability gap"
+          ],
+          "verification": [
+            "candidate remains private and unpromoted"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "knowledge-learning",
+      "order": 120,
+      "title": "Private evidence retrieval and learning",
+      "purpose": "Search verified private knowledge and prepare redacted reusable candidate cards.",
+      "requires": [],
+      "oftenWith": [],
+      "references": [
+        "knowledge-card.schema.json"
+      ],
+      "operations": [
+        {
+          "id": "search",
+          "risk": "local_artifact_write",
+          "scripts": [
+            "ks_knowledge.py"
+          ],
+          "outputs": [
+            "bounded verified or promoted evidence set"
+          ],
+          "verification": [
+            "scope, version, and live state rechecked"
+          ]
+        },
+        {
+          "id": "prepare-candidate",
+          "risk": "local_artifact_write",
+          "scripts": [
+            "ks_knowledge.py"
+          ],
+          "outputs": [
+            "redacted candidate knowledge card"
+          ],
+          "verification": [
+            "candidate remains private and unpromoted"
+          ]
+        },
+        {
+          "id": "review-promotion",
+          "risk": "read_only",
+          "scripts": [
+            "ks_knowledge.py"
+          ],
+          "outputs": [
+            "promotion eligibility report"
+          ],
+          "verification": [
+            "independent evidence and synthetic portability confirmed"
+          ]
+        }
+      ]
+    }
+  ]
+}

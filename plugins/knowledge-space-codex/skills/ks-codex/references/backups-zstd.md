@@ -66,6 +66,26 @@ zstdcat /path/to/zstdunpack.json > /tmp/ks-backup-unpacked/zstdunpacked2.json
 
 The input filename may still end with `.json` even when its contents are zstd-compressed. Trust the compression format, not only the extension.
 
+## Restore Artifact Versus Inspection Artifact
+
+Keep the original compressed backup bytes immutable. The decompressed file and
+any `.clean.json` copy are inspection artifacts, not interchangeable restore
+uploads. Unless the exact KS restore endpoint explicitly documents raw JSON
+input, upload the original validated zstd backup or an output produced by the
+supported pack workflow. Renaming decompressed JSON to a backup-like extension
+does not recreate the archive format.
+
+Before a restore preflight, record the SHA-256 of the compressed upload artifact
+and test the compression stream without extracting over another file:
+
+```bash
+shasum -a 256 "/path/to/backup.zst"
+zstd -t "/path/to/backup.zst"
+```
+
+Do not substitute the decompressed analysis copy after approval; changed bytes
+require a new validation result and a new exact restore approval.
+
 ## Validate The Result
 
 Check the output exists and has content:

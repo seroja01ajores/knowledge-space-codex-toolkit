@@ -40,6 +40,20 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def snapshot_errors(snapshot: dict[str, Any]) -> list[Any]:
+    """Return normalized collection failures recorded by the audit runner."""
+    errors = snapshot.get("errors")
+    if isinstance(errors, list):
+        return errors
+    if errors:
+        return [errors]
+    return []
+
+
+def snapshots_are_complete(reference: dict[str, Any], candidate: dict[str, Any]) -> bool:
+    return not snapshot_errors(reference) and not snapshot_errors(candidate)
+
+
 def get_id(item: Any) -> str | None:
     if not isinstance(item, dict):
         return None
@@ -411,6 +425,9 @@ def section_diff(reference: dict[str, Any], candidate: dict[str, Any]) -> list[d
 
 
 def render_report(reference: dict[str, Any], candidate: dict[str, Any], title: str) -> str:
+    reference_errors = snapshot_errors(reference)
+    candidate_errors = snapshot_errors(candidate)
+    comparison_valid = not reference_errors and not candidate_errors
     lines = [
         f"# {title}",
         "",
@@ -418,10 +435,27 @@ def render_report(reference: dict[str, Any], candidate: dict[str, Any], title: s
         f"- candidateProjectUuid: `{candidate.get('projectUuid')}`",
         f"- referenceCreatedAt: `{reference.get('createdAt')}`",
         f"- candidateCreatedAt: `{candidate.get('createdAt')}`",
-        f"- referenceSnapshotErrors: `{len(reference.get('errors', []))}`",
-        f"- candidateSnapshotErrors: `{len(candidate.get('errors', []))}`",
+        f"- referenceSnapshotErrors: `{len(reference_errors)}`",
+        f"- candidateSnapshotErrors: `{len(candidate_errors)}`",
+        f"- comparisonValid: `{'true' if comparison_valid else 'false'}`",
         "",
     ]
+
+    if not comparison_valid:
+        lines.extend(
+            [
+                "## Summary",
+                "- Comparison blocked: at least one snapshot is incomplete.",
+                "- Missing or extra entities cannot be inferred from partial collection results.",
+                "",
+                "## Recommended Next Actions",
+                "- Resolve the snapshot collection errors, confirm project access, and collect both snapshots again.",
+                "- Re-run this diff only when both snapshots report zero collection errors.",
+                "- Do not use this incomplete report to authorize a restore, write, cleanup, or deletion.",
+                "",
+            ]
+        )
+        return "\n".join(lines)
 
     rows = section_diff(reference, candidate)
     blockers = []
@@ -597,7 +631,7 @@ def main() -> int:
         print(f"Wrote {args.out}")
     else:
         print(report)
-    return 0
+    return 0 if snapshots_are_complete(reference, candidate) else 2
 
 
 if __name__ == "__main__":

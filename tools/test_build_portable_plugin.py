@@ -147,6 +147,68 @@ class PortablePluginBuilderTests(unittest.TestCase):
                 builder.build_portable_plugin(plugin, output)
             self.assertFalse(output.exists())
 
+    def test_generated_knowledge_database_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            plugin = self._fixture(root)
+            (plugin / "knowledge.sqlite").write_bytes(b"derived private index")
+            output = root / "out"
+
+            with self.assertRaisesRegex(
+                builder.ReleaseBuildError,
+                "forbidden-sensitive-artifact",
+            ):
+                builder.build_portable_plugin(plugin, output)
+            self.assertFalse(output.exists())
+
+    def test_missing_declared_skill_resource_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            plugin = self._fixture(root)
+            skill = plugin / "skills" / "demo-skill" / "SKILL.md"
+            skill.write_text(
+                skill.read_text(encoding="utf-8")
+                + "\nRead `references/missing.md` before execution.\n",
+                encoding="utf-8",
+            )
+            output = root / "out"
+
+            with self.assertRaisesRegex(
+                builder.ReleaseBuildError,
+                "declares missing resource",
+            ):
+                builder.build_portable_plugin(plugin, output)
+            self.assertFalse(output.exists())
+
+    def test_release_metadata_rejects_stale_marketplace_ref(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            readme = Path(temp_dir) / "README.md"
+            readme.write_text(
+                "codex plugin marketplace add owner/repo --ref v0.4.0\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(
+                builder.ReleaseBuildError,
+                "do not match plugin version",
+            ):
+                builder._validate_repository_release_metadata(
+                    {"version": "0.5.0"},
+                    readme,
+                )
+
+    def test_release_metadata_accepts_all_matching_refs(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            readme = Path(temp_dir) / "README.md"
+            readme.write_text(
+                "codex plugin marketplace add owner/repo --ref v0.5.0\n"
+                "codex plugin marketplace add owner/repo --ref v0.5.0\n",
+                encoding="utf-8",
+            )
+            builder._validate_repository_release_metadata(
+                {"version": "0.5.0"},
+                readme,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

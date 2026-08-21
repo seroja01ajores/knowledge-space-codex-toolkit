@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://teamvalue.invalid/schemas/ks-capability-request.schema.json",
+  "title": "KS coordinated capability request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "formatVersion",
+    "mode",
+    "capabilities"
+  ],
+  "properties": {
+    "format": {
+      "const": "teamvalue.ks-capability-request"
+    },
+    "formatVersion": {
+      "const": "1.0"
+    },
+    "mode": {
+      "const": "coordinated"
+    },
+    "phase": {
+      "enum": [
+        "analysis",
+        "change",
+        "runtime",
+        "verification"
+      ],
+      "default": "analysis"
+    },
+    "parentPlanSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "operation"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "operation": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "api-readback",
+          "browser",
+          "offline-report",
+          "isolated-restore-readback"
+        ]
+      },
+      "default": []
+    },
+    "knowledge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "search": {
+          "type": "boolean",
+          "default": false
+        },
+        "captureCandidate": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "default": {
+        "search": false,
+        "captureCandidate": false
+      }
+    }
+  }
+}

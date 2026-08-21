@@ -1,0 +1,330 @@
+{
+  "format": "teamvalue.ks-capability-scenarios",
+  "formatVersion": "1.0",
+  "cases": [
+    {
+      "id": "six-area-runtime-chain",
+      "purpose": "Trace an integration-to-iframe failure without limiting the causal chain.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "runtime",
+        "capabilities": [
+          {"id": "integrations", "operation": "run"},
+          {"id": "model-data", "operation": "inspect"},
+          {"id": "indicators-formulas", "operation": "inspect"},
+          {"id": "tables", "operation": "inspect"},
+          {"id": "dashboard-ui", "operation": "inspect"},
+          {"id": "browser-diagnostics", "operation": "inspect"}
+        ],
+        "verification": ["api-readback", "browser"],
+        "knowledge": {"search": true, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "external_or_runtime",
+        "directCapabilities": [
+          "integrations.run",
+          "model-data.inspect",
+          "indicators-formulas.inspect",
+          "tables.inspect",
+          "dashboard-ui.inspect",
+          "browser-diagnostics.inspect"
+        ],
+        "includedAreas": [
+          "environment-project",
+          "integrations",
+          "model-data",
+          "indicators-formulas",
+          "tables",
+          "dashboard-ui",
+          "browser-diagnostics"
+        ],
+        "phaseIds": [
+          "read-current-state",
+          "retrieve-private-evidence",
+          "cross-area-synthesis",
+          "approval-boundary",
+          "prepare-integrations-run",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "dashboard-project-change",
+      "purpose": "Prepare one known dashboard change with read-before and browser proof.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "change",
+        "capabilities": [
+          {"id": "dashboard-ui", "operation": "change"}
+        ],
+        "verification": ["api-readback", "browser"],
+        "knowledge": {"search": false, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "project_write",
+        "directCapabilities": ["dashboard-ui.change"],
+        "includedAreas": ["environment-project", "dashboard-ui"],
+        "phaseIds": [
+          "read-current-state",
+          "approval-boundary",
+          "prepare-dashboard-ui-change",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "iframe-session-isolation-diagnosis",
+      "purpose": "Separate browser, KS, and external-service state before changing anything.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "analysis",
+        "capabilities": [
+          {"id": "dashboard-ui", "operation": "inspect"},
+          {"id": "browser-diagnostics", "operation": "inspect"},
+          {"id": "integrations", "operation": "inspect"}
+        ],
+        "verification": ["offline-report", "browser"],
+        "knowledge": {"search": false, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "read_only",
+        "directCapabilities": [
+          "dashboard-ui.inspect",
+          "browser-diagnostics.inspect",
+          "integrations.inspect"
+        ],
+        "includedAreas": [
+          "environment-project",
+          "dashboard-ui",
+          "browser-diagnostics",
+          "integrations"
+        ],
+        "phaseIds": [
+          "read-current-state",
+          "cross-area-synthesis",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "bpms-approved-runtime",
+      "purpose": "Run one BPMS operation without treating runtime as a project write.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "runtime",
+        "capabilities": [
+          {"id": "bpms", "operation": "run"}
+        ],
+        "verification": ["api-readback"],
+        "knowledge": {"search": false, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "external_or_runtime",
+        "directCapabilities": ["bpms.run"],
+        "includedAreas": ["environment-project", "bpms"],
+        "phaseIds": [
+          "read-current-state",
+          "cross-area-synthesis",
+          "approval-boundary",
+          "prepare-bpms-run",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "course-reconstruction-build",
+      "purpose": "Build a course project while preserving dependencies and verification.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "change",
+        "capabilities": [
+          {"id": "course-reconstruction", "operation": "build"}
+        ],
+        "verification": ["api-readback", "browser"],
+        "knowledge": {"search": true, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "project_write",
+        "directCapabilities": ["course-reconstruction.build"],
+        "includedAreas": ["environment-project", "course-reconstruction"],
+        "phaseIds": [
+          "read-current-state",
+          "retrieve-private-evidence",
+          "cross-area-synthesis",
+          "approval-boundary",
+          "prepare-course-reconstruction-build",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "scratch-restore-destructive",
+      "purpose": "Keep an isolated restore behind a destructive target-specific gate.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "change",
+        "capabilities": [
+          {"id": "backup-roundtrip", "operation": "restore-scratch"}
+        ],
+        "verification": ["isolated-restore-readback"],
+        "knowledge": {"search": false, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "destructive_or_global",
+        "directCapabilities": ["backup-roundtrip.restore-scratch"],
+        "includedAreas": ["backup-roundtrip"],
+        "phaseIds": [
+          "read-current-state",
+          "approval-boundary",
+          "prepare-backup-roundtrip-restore-scratch",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "private-learning-candidate",
+      "purpose": "Prepare reusable private evidence without auto-promotion.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "verification",
+        "capabilities": [
+          {"id": "knowledge-learning", "operation": "prepare-candidate"}
+        ],
+        "verification": ["offline-report"],
+        "knowledge": {"search": false, "captureCandidate": true}
+      },
+      "expected": {
+        "effectiveRisk": "local_artifact_write",
+        "directCapabilities": ["knowledge-learning.prepare-candidate"],
+        "includedAreas": ["knowledge-learning"],
+        "phaseIds": [
+          "approval-boundary",
+          "prepare-knowledge-learning-prepare-candidate",
+          "verification",
+          "prepare-learning-candidate"
+        ]
+      }
+    },
+    {
+      "id": "publication-change",
+      "purpose": "Change a publication only after dashboard dependencies are read.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "change",
+        "capabilities": [
+          {"id": "publications-gantt", "operation": "change"}
+        ],
+        "verification": ["api-readback", "browser"],
+        "knowledge": {"search": false, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "project_write",
+        "directCapabilities": ["publications-gantt.change"],
+        "includedAreas": [
+          "environment-project",
+          "dashboard-ui",
+          "publications-gantt"
+        ],
+        "phaseIds": [
+          "read-current-state",
+          "cross-area-synthesis",
+          "approval-boundary",
+          "prepare-publications-gantt-change",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "read-only-impact-graph",
+      "purpose": "Build a source-linked impact graph from several project surfaces.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "analysis",
+        "capabilities": [
+          {"id": "model-data", "operation": "inspect"},
+          {"id": "indicators-formulas", "operation": "inspect"},
+          {"id": "tables", "operation": "inspect"},
+          {"id": "dashboard-ui", "operation": "inspect"},
+          {"id": "backup-roundtrip", "operation": "inspect"}
+        ],
+        "verification": ["offline-report"],
+        "knowledge": {"search": false, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "read_only",
+        "directCapabilities": [
+          "model-data.inspect",
+          "indicators-formulas.inspect",
+          "tables.inspect",
+          "dashboard-ui.inspect",
+          "backup-roundtrip.inspect"
+        ],
+        "includedAreas": [
+          "environment-project",
+          "model-data",
+          "indicators-formulas",
+          "tables",
+          "dashboard-ui",
+          "backup-roundtrip"
+        ],
+        "phaseIds": [
+          "read-current-state",
+          "cross-area-synthesis",
+          "verification"
+        ]
+      }
+    },
+    {
+      "id": "resumed-browser-verification",
+      "purpose": "Resume a plan from a hash without carrying raw prior responses.",
+      "request": {
+        "format": "teamvalue.ks-capability-request",
+        "formatVersion": "1.0",
+        "mode": "coordinated",
+        "phase": "verification",
+        "parentPlanSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "capabilities": [
+          {"id": "dashboard-ui", "operation": "inspect"},
+          {"id": "browser-diagnostics", "operation": "inspect"}
+        ],
+        "verification": ["api-readback", "browser"],
+        "knowledge": {"search": false, "captureCandidate": false}
+      },
+      "expected": {
+        "effectiveRisk": "read_only",
+        "directCapabilities": [
+          "dashboard-ui.inspect",
+          "browser-diagnostics.inspect"
+        ],
+        "includedAreas": [
+          "environment-project",
+          "dashboard-ui",
+          "browser-diagnostics"
+        ],
+        "phaseIds": [
+          "read-current-state",
+          "cross-area-synthesis",
+          "verification"
+        ]
+      }
+    }
+  ]
+}

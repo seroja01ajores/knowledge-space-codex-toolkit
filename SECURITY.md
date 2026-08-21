@@ -47,6 +47,10 @@
   ответ на изменение или runtime-действие отмечается как `effect_unknown`;
   пакет останавливается, автоматический повтор запрещается, а заявленное
   контрольное чтение выполняется, когда это возможно.
+- Capability-план, context pack, handoff, карточка опыта и execution receipt
+  являются доказательствами и состоянием работы, но не разрешением. Они не
+  могут понизить уровень допуска, заменить точное подтверждение или разрешить
+  повтор операции с неизвестным эффектом.
 
 ### Безопасность резервных копий и диаграмм
 
@@ -110,6 +114,10 @@ Unknown or ambiguous operations fail closed.
   first login or project API call. A lost mutation/runtime response is reported
   as `effect_unknown`; the batch stops, automatic retry is forbidden, and the
   declared read-back is attempted when possible.
+- Capability plans, context packs, handoffs, knowledge cards and execution
+  receipts are evidence and task state, not authorization. They cannot lower a
+  capability gate, replace exact approval or permit retry after an unknown
+  effect.
 
 ### Backup and diagram safety
 
