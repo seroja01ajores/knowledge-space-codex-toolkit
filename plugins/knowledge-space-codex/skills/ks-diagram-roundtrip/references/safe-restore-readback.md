@@ -20,14 +20,19 @@ executor may proceed only after a fresh read-only preflight and exact
 Run a fresh read-only discovery and record before requesting upload approval:
 
 - exact stand origin and authenticated user identity;
+- confirmation that this identity can create a project and start a restore;
 - source project origin and UUID;
 - intended new scratch project name;
-- packed backup absolute path, size, and SHA-256;
+- packed backup absolute path, size, SHA-256, and successful compression test;
+- confirmation that the upload is the original or supported packed zstd artifact,
+  not the decompressed inspection JSON;
 - pack-report path and SHA-256 with successful packed read-back;
 - final bundle-validation report path and SHA-256 with zero hard errors;
 - source, plan, clean-output, and packed-output SHA-256 values;
 - exact accepted deferred paths from the bound build report;
 - restore options fixed to new project, current user only, and recalculation off;
+- intended post-restore users and exact access roles, recorded separately from
+  the restore approval;
 - confirmation that no existing project UUID is a restore target;
 - the exact requested action, approval identity, approval timestamp, and the
   artifact/option snapshot covered by that approval.
@@ -65,14 +70,20 @@ recalculation, retry with changed inputs, cleanup, or deletion.
 After success, collect server-assigned values rather than assuming backup UUIDs:
 
 - new project name and UUID;
-- owner/current-user access;
+- a non-empty server-assigned project UUID that differs from the source UUID;
+- owner/current-user access, checked through both project list and direct read;
+- intended additional user access checked under each intended identity before
+  calling the scratch project ready;
 - restore history success status;
+- expected high-level entity and dashboard counts compared with the validated
+  backup manifest;
 - ordinary class entity and tree UUIDs;
 - semantic relationship entity and tree UUIDs;
 - source and destination class names/UUIDs;
 - class/relationship descriptions;
 - helper relation closure where API exposes it;
 - absence of writes to the source and other work projects;
+- source project identity and high-level counts unchanged after the restore;
 - browser tree/detail visibility.
 
 Write a separate read-back binding artifact if another offline round-trip needs

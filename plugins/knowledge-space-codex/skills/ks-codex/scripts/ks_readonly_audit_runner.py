@@ -165,11 +165,15 @@ def dashboard_summary(path: Path) -> dict[str, Any]:
     rows = body.get("rows") if isinstance(body.get("rows"), list) else []
     overlaps = body.get("overlaps") if isinstance(body.get("overlaps"), dict) else {}
     risky = [row for row in rows if isinstance(row, dict) and row.get("risks")]
+    runtime_verification = [
+        row for row in rows if isinstance(row, dict) and row.get("runtime_verification")
+    ]
     overlap_count = sum(len(value) for value in overlaps.values() if isinstance(value, list))
     return {
         "available": True,
         "cells": len(rows),
         "riskyCells": len(risky),
+        "runtimeVerificationCells": len(runtime_verification),
         "overlaps": overlap_count,
     }
 
@@ -318,6 +322,7 @@ def write_summary(
             "",
             f"- Dashboard cells: `{dashboard.get('cells', 'n/a')}`",
             f"- Dashboard risky cells: `{dashboard.get('riskyCells', 'n/a')}`",
+            f"- Dashboard cells requiring runtime verification: `{dashboard.get('runtimeVerificationCells', 'n/a')}`",
             f"- Dashboard overlaps: `{dashboard.get('overlaps', 'n/a')}`",
             f"- Data tables with risks: `{tables.get('tablesWithRisks', 'n/a')}`",
             f"- Data tables OK: `{tables.get('tablesOk', 'n/a')}`",
@@ -343,6 +348,7 @@ def write_summary(
             "## Safety Notes",
             "",
             "- This runner is read-only by design.",
+            "- Zero structural dashboard risks do not prove runtime rendering or event behavior; inspect every runtime-verification signal in a browser.",
             "- Do not treat this report as approval to write, run integrations, start BPMS, import/export, delete, or change access.",
             "- For any repair, create a safe patch plan, read current state first, apply only project-scoped changes, and verify read-back.",
             "",
@@ -350,8 +356,9 @@ def write_summary(
             "",
             "1. Inspect snapshot errors first; missing optional endpoints can be acceptable, but auth/project-scope failures are blockers.",
             "2. Inspect dashboard risks/overlaps before changing layouts or events.",
-            "3. Inspect table risks before blaming dashboard cells for blank table rendering.",
-            "4. Inspect integration/BPMS summaries in read-only mode; execute runtime actions only after exact approval.",
+            "3. Verify runtime-only dashboard behavior in browser DOM, console, and network without changing the project.",
+            "4. Inspect table risks before blaming dashboard cells for blank table rendering.",
+            "5. Inspect integration/BPMS summaries in read-only mode; execute runtime actions only after exact approval.",
         ]
     )
     summary = out_dir / "audit_summary.md"

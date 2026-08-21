@@ -29,6 +29,8 @@ knowledge-space-codex-private/
   core.lock.json              # pinned public repository commit and version
   stand-profiles/             # non-secret aliases plus secret references
   learned-evidence/           # redacted captures and comparisons
+  knowledge-cards/            # normalized observation/candidate/verified cards
+  indexes/                    # ignored derived FTS/vector indexes
   project-runs/               # ignored backup/diagram run directories
   runbooks/                   # organization-specific verified procedures
 ```
@@ -37,10 +39,14 @@ Pin the public core by commit. Upgrade it in a review branch, run public tests
 plus private synthetic/evaluation tests, then update `core.lock.json`. Never
 copy the private overlay into the plugin release directory.
 
+Ignore `indexes/`, `*.db`, `*.sqlite` and `*.sqlite3`. Rebuild those derived
+artifacts from reviewed cards. Do not treat possession of an index as
+permission to read every card: organization, stand and project access filters
+remain mandatory for any shared retrieval service.
+
 ## Continuity rule
 
 Publishing a new public core must not delete, rewrite or make public the
 existing private repository. Before any repository rename or visibility
 change, create and verify a private full-history Git bundle and retain the
 original private remote under a distinct name.
-

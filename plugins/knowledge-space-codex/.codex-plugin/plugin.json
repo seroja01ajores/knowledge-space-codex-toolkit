@@ -1,6 +1,6 @@
 {
   "name": "knowledge-space-codex",
-  "version": "0.4.0+codex.20260819",
+  "version": "0.5.0",
   "description": "Portable Codex plugin for auditing, building, verifying, and diagramming Knowledge Space projects.",
   "author": {
     "name": "TeamValue"
@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "Knowledge Space Codex",
     "shortDescription": "Audit, build, verify, and diagram KS projects safely.",
-    "longDescription": "A stand-agnostic Knowledge Space toolkit for API-first project audits and safe project-scoped edits; course and scratch-project reconstruction; models, classes, indicators, formulas, objects and data; tables, dashboards, publications, Gantt, integrations and BPMS; browser-assisted verification; session-scoped dynamic IFRAME routing; external web-service contracts; and an offline, manifest-bound KS backup to Diagramm JSON round-trip. The diagram workflow supports schema 1.2, semantic relationship normalization, read-only indicator and formula provenance, non-numeric indicator presentation as attributes, per-class object counts, source-bound change plans, structural validation, cloned-backup packing, and isolated restore/read-back gates. Runtime actions remain available through exact-approved flows, while destructive or live restore actions require a separate target-specific approval.",
+    "longDescription": "A stand-agnostic Knowledge Space toolkit for API-first project audits, safe project-scoped edits, adaptive Direct/Coordinated/Discovery work, unbounded multi-area diagnostics, phase-scoped context packs, resumable handoffs, evidence lifecycle management, execution receipts, course and scratch-project reconstruction, browser-assisted verification, session-scoped dynamic IFRAME routing, external web-service contracts, and an offline manifest-bound KS backup to Diagramm JSON round-trip. The diagram workflow supports schema 1.2, semantic relationship normalization, read-only indicator and formula provenance, non-numeric indicator presentation as attributes, per-class object counts, source-bound change plans, structural validation, cloned-backup packing, and isolated restore/read-back gates. Planning, retrieved knowledge, handoffs, and receipts never authorize execution: runtime actions use exact-approved flows, while destructive or live restore actions require separate target-specific approval.",
     "developerName": "TeamValue",
     "category": "Productivity",
     "capabilities": [
@@ -33,11 +33,21 @@
       "Diagram Enrichment",
       "Session-scoped IFRAME Routing",
       "External Web-service Contracts",
-      "Relationship Normalization"
+      "Relationship Normalization",
+      "Multi-domain Orchestration",
+      "Adaptive Context Packs",
+      "Resumable Task Handoffs",
+      "Local Knowledge Retrieval",
+      "Evidence Lifecycle",
+      "Execution Receipts",
+      "Discovery Workflows",
+      "Iframe Session Diagnostics",
+      "Impact and Health Reports"
     ],
     "websiteURL": "https://github.com/seroja01ajores/knowledge-space-codex-toolkit",
     "defaultPrompt": [
       "Audit this KS project safely.",
+      "Diagnose this cross-area KS behavior and prepare an evidence-bound plan.",
       "Recreate or verify this KS course project.",
       "Prepare a KS backup to Diagramm round-trip.",
       "Configure per-session dynamic IFRAME routing in a KS dashboard.",

@@ -31,6 +31,9 @@ SEMVER_RE = re.compile(
     r"(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
     r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$"
 )
+DECLARED_RESOURCE_RE = re.compile(
+    r"`((?:references|scripts|docs)/[A-Za-z0-9_./-]+\.(?:md|json|py|ya?ml))`"
+)
 
 EXCLUDED_DIRECTORY_NAMES = {"__pycache__"}
 EXCLUDED_FILE_NAMES = {".DS_Store"}
@@ -45,6 +48,7 @@ FORBIDDEN_FILE_SUFFIXES = {
     ".backup",
     ".bak",
     ".bkp",
+    ".db",
     ".cer",
     ".crt",
     ".der",
@@ -56,6 +60,8 @@ FORBIDDEN_FILE_SUFFIXES = {
     ".p12",
     ".pem",
     ".pfx",
+    ".sqlite",
+    ".sqlite3",
     ".zst",
     ".zstd",
 }
@@ -263,6 +269,28 @@ def _parse_frontmatter_value(text: str, key: str) -> str | None:
     return match.group(1).strip().strip("\"'")
 
 
+def _validate_declared_skill_resources(
+    skill_file: ReleaseFile,
+    text: str,
+    by_path: dict[PurePosixPath, ReleaseFile],
+) -> None:
+    """Fail closed when an entrypoint names a missing bundled resource."""
+    for token in sorted(set(DECLARED_RESOURCE_RE.findall(text))):
+        relative = PurePosixPath(token)
+        if relative.is_absolute() or ".." in relative.parts:
+            raise ReleaseBuildError(
+                f"{skill_file.relative_path} declares unsafe resource {token!r}"
+            )
+        if relative.parts[0] == "docs":
+            expected = relative
+        else:
+            expected = skill_file.relative_path.parent / relative
+        if expected not in by_path:
+            raise ReleaseBuildError(
+                f"{skill_file.relative_path} declares missing resource {token!r}"
+            )
+
+
 def _validate_structure(files: Iterable[ReleaseFile]) -> tuple[dict[str, object], list[str]]:
     by_path = {item.relative_path: item for item in files}
     manifest_path = PurePosixPath(".codex-plugin/plugin.json")
@@ -322,9 +350,36 @@ def _validate_structure(files: Iterable[ReleaseFile]) -> tuple[dict[str, object]
             raise ReleaseBuildError(
                 f"{skill_file.relative_path} must declare a nonempty description"
             )
+        _validate_declared_skill_resources(skill_file, text, by_path)
         skill_names.append(expected_name)
 
     return manifest, skill_names
+
+
+def _validate_repository_release_metadata(
+    manifest: dict[str, object],
+    readme_path: Path,
+) -> None:
+    """Keep public install commands pinned to the canonical plugin version."""
+    version = manifest.get("version")
+    if not isinstance(version, str) or not SEMVER_RE.fullmatch(version):
+        raise ReleaseBuildError("Cannot validate README against an invalid version")
+    try:
+        readme = readme_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise ReleaseBuildError(f"Cannot read release README: {exc}") from exc
+    pinned_versions = re.findall(
+        r"codex plugin marketplace add\s+\S+\s+--ref\s+v([^\s]+)",
+        readme,
+    )
+    if not pinned_versions:
+        raise ReleaseBuildError("README has no pinned marketplace install command")
+    stale = sorted({item for item in pinned_versions if item != version})
+    if stale:
+        raise ReleaseBuildError(
+            "README marketplace refs do not match plugin version "
+            f"{version}: {', '.join(stale)}"
+        )
 
 
 def _write_archive(archive_path: Path, outer_folder: str, files: list[ReleaseFile]) -> None:
@@ -398,6 +453,8 @@ def build_portable_plugin(plugin_root: Path, output_dir: Path) -> BuildResult:
 
     files = _collect_release_files(plugin_root)
     manifest, skill_names = _validate_structure(files)
+    if plugin_root == CANONICAL_PLUGIN_ROOT.resolve():
+        _validate_repository_release_metadata(manifest, REPO_ROOT / "README.md")
     name = str(manifest["name"])
     version = str(manifest["version"])
     archive_name = f"{name}-{version}.zip"

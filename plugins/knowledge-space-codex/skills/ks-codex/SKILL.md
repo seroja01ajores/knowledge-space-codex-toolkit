@@ -70,6 +70,10 @@ For new Python automation scripts, prefer the bundled `scripts/ks_api_client.py`
 6. Make small project-scoped API writes.
    For JSON safe patch plans, run `scripts/ks_safe_patch_lint.py` first. Use `scripts/ks_safe_patch_execute.py` only for read-only calls and approved `project_write` operations; runtime/destructive/server actions are not banned, but require a separate exact-approved runtime/destructive/server flow.
    For intentional integration runs, connection checks, integration-table refresh/export/update, BPMS start/complete, or recalculation, use `scripts/ks_approved_runtime_execute.py` with `metadata.mode=approved_runtime`, exact operation approval, target project verification, and read-back/verification or an explicit verification waiver.
+   After either executor writes its JSON report, use
+   `scripts/ks_execution_receipt.py` for a compact hashed evidence receipt.
+   Read `references/execution-receipts.md`; a receipt never carries approval
+   or authorizes retry.
    Runtime payload credentials must come only from purpose-created
    `KS_RUNTIME_PAYLOAD_*` environment variables declared by exact payload path;
    never reuse `KS_TOKEN`, `KS_PASSWORD`, SSH, cloud, or source-control
@@ -79,66 +83,130 @@ For new Python automation scripts, prefer the bundled `scripts/ks_api_client.py`
 
 When browser access is unavailable, still build and audit through API, but mark visual behavior as unverified. Do not call a user-facing interface complete only because JSON references are present.
 
-## What To Load Next
+## Adaptive Task Operating Model
 
-- Read `references/api-map.md` for endpoint names, payload casing, and known API quirks.
-- Read `references/api-client-patterns.md` before writing automation scripts or troubleshooting API/session issues.
-- Read `references/openapi-endpoints.md` when choosing endpoints for an unfamiliar KS feature.
-- Read `references/ui-observed-builder.md` when creating a project or constructor entities from scratch; it summarizes payloads observed from the KS UI.
-- Read `references/payload-examples.md` when you need compact redacted snippets for dashboard events, table constructors, publications, integration conditions, or BPMS task updates.
-- Read `references/project-audit.md` before diagnosing a whole project or empty interfaces.
-- Read `references/dashboard-events.md` before editing dashboards, nested interfaces, widgets, tables, modals, buttons, or Gantt events.
-- Read `references/iframe-session-bridge.md` when a KS interface must switch an embedded IFRAME URL without a dashboard reload and the final URL must remain isolated to one browser session.
-- Read `references/external-web-session-contracts.md` before connecting a KS dashboard or IFRAME to a multi-user external service, queue, or callback API.
-- Read `references/interface-authoring.md` before creating an interface from a design/Figma/template, adding analyst comments/descriptions, or doing layout tasks such as alignment, spacing, overlap repair, and readable table/modal layout.
-- Read `references/bpms-patterns.md` before inspecting or configuring business processes, BPMS tasks, process-triggered integrations, variables, or process history.
-- Read `references/complex-project-patterns.md` before auditing large planning or
-  forecasting projects with role dashboards, nested navigation, modal flows,
-  wide tables, and many integrations/processes.
-- Read `references/ui-network-capture.md` when Swagger or existing references are insufficient and you need to learn endpoint/payload shapes by observing KS UI actions.
-- Read `references/devtools-diagnostics.md` when using Chrome/Edge DevTools to diagnose KS UI behavior through Network, WebSocket messages, console dashboard event logs, session storage, frontend cache, responsive view checks, or browser-only errors.
-- Read `references/ks-1-7-field-notes.md` when troubleshooting KS 1.7 behavior around dictionaries, integrations, formulas, tables, and interface edge cases captured from field knowledge-base cards.
-- Read `references/advanced-course-patterns.md` before building or auditing the advanced KS course, especially widgets, dimensional currency data, Gantt modal events, and publication nodes.
-- Read `references/course-project-workflows.md` before recreating, completing,
-  or comparing a base, advanced, or integration training project in an isolated
-  scratch project.
-- Read `references/safe-writes.md` before using any create/update/save endpoint.
-- Read `references/safe-patch-workflow.md` before generated patch batches, broad repairs, integration/BPMS runtime actions, destructive operations, imports/exports, or any change where execution mode and approval level matter.
-- Read `references/backups-zstd.md` before inspecting exported KS project backups or `.zst`/zstd-compressed JSON.
-- Read `references/project-clone-restore.md` before cloning a complete KS project through backup/restore or deleting an accidental empty clone.
-- Use `$ks-diagram-roundtrip` for the versioned offline workflow `KS backup -> Diagramm JSON -> dry-run change plan -> cloned backup`; it owns bridge maps, supported/deferred field rules, structural validation, packing, and isolated restore/read-back safety.
-- Read `references/integrations-patterns.md` before working with sources, integrations, operations, integration tables, mappings, or integration-course projects.
-- Read `references/integrations-course-build-spec.md` when recreating the DB integration course from scratch or comparing an integration-course project with the final demo backup.
-- Use `scripts/ks_smoke_check.py` for a quick read-only project overview when env vars are available.
-- Use `scripts/ks_project_diff.py` to compare two sanitized read-only snapshots before broad rebuilds, course checks, or interface repair work.
-- Use `scripts/ks_integration_readonly_audit.py` to compare integration-course snapshots safely; it filters field rules and output sampling conditions by operation UUID so global read-back lists do not produce false counts.
-- Use `scripts/ks_bpms_audit.py` after snapshots to inspect BPMS processes, tasks, run-integration settings, broken references, and run-safety warnings offline without calling KS.
-- Use `scripts/ks_table_audit.py` after snapshots to inspect data table constructor rows/columns/filters and catch broken model/class/indicator/dictionary references before blaming dashboard layout.
-- Use `scripts/ks_dashboard_cell_report.py` after snapshots to inspect dashboard cells, refs, events, coordinates, and overlap risks before any layout repair.
-- Use `scripts/ks_dashboard_layout_plan.py` to generate an offline dry-run plan for dashboard alignment/spacing fixes before `/dashboards/update`.
-- Use `scripts/ks_comment_audit.py` to audit verified description/comment targets and prepare safe analyst-description plans without inventing unsupported metadata.
-- Use `scripts/ks_publication_patch_plan.py` to prepare a dry-run publication inner-node plan before adding visible or hidden dashboards to an application.
-- Use `scripts/ks_safe_patch_lint.py` to classify a JSON patch plan offline and identify required execution gates before running API changes.
+Codex interprets the request semantically; scripts never classify user wording.
+Select any number of areas required by entities, effects, dependencies, safety,
+and verification. The planner already has no numeric area limit; never truncate
+a real dependency chain to fit an arbitrary count.
+
+- **Direct**: entities and outcome are clear; work without a capability plan.
+- **Coordinated**: dependent phases, approvals, handoff, resume, or audit trail;
+  keep a structured plan and load details per phase.
+- **Discovery**: no matching section or uncertain entity/effect; gather minimal
+  read-only evidence, then switch to Direct or Coordinated.
+
+For every mode, load only current-phase detail, but add every reference actually
+needed. Reduce completed evidence to UUID-bound facts, unknowns, approvals,
+artifacts, verification status, and next action; never retain credentials or
+raw customer data. Rebuild the working set when evidence changes.
+
+For Coordinated work, follow `multidomain-orchestration.md`. Codex selects
+capability and operation IDs; `ks_capability_plan.py` validates them, expands
+prerequisites/read-before phases, and remains planning-only. Actual effect
+classification stays with the safe patch and approved runtime tools.
+After writing a plan outside the plugin, use its `pack` command for the
+current phase. The result contains only resource paths, hashes, gates, expected
+outputs, and handoff policy; it embeds no reference or script content and never
+authorizes execution. Read `references/adaptive-context-packs.md` for the
+contract and resume flow.
+For work resumed in another task or after an approval boundary, use
+`scripts/ks_task_handoff.py` and read `references/task-handoff.md`. Keep the
+handoff outside the plugin; it carries reduced evidence and lineage, not raw
+responses or permission.
+
+For Discovery, inspect API maps/OpenAPI first, then redacted official UI
+network evidence. Use read-only server/DB diagnostics only when API/UI is
+insufficient and policy permits it. Record a capability gap or candidate card
+after solving; discovery never inherits non-read permission. For a Coordinated
+unknown task, select one or more `capability-discovery` operations alongside
+every already-known area involved; this is a fallback evidence workflow, not a
+natural-language router.
+
+Read references/use-case-patterns.md only when the request is unfamiliar,
+product-shaped, ambiguous between modes, or involves cross-area state,
+multi-user/session isolation, migration, lineage, or reusable automation.
+Skip it for routine Direct work.
+
+## Capability And Reference Map
+
+This is the full surface overview; operation details stay in
+`capability-index.json` and load only on demand.
+
+| Area | Load on demand |
+| --- | --- |
+| Environment/API | `api-client-patterns.md`, `api-map.md`, `openapi-endpoints.md` |
+| Models/data | `project-audit.md`, `api-map.md`, `ui-observed-builder.md` |
+| Indicators/formulas | `api-map.md`, `payload-examples.md`, version field notes |
+| Tables | `project-audit.md`, `dashboard-events.md`, `payload-examples.md` |
+| Dashboards/interfaces | `dashboard-events.md`, `interface-authoring.md` |
+| IFRAME/external sessions | `iframe-session-bridge.md`, `external-web-session-contracts.md` |
+| Publications/Gantt | `dashboard-events.md`, `payload-examples.md` |
+| Integrations | `integrations-patterns.md` |
+| BPMS | `bpms-patterns.md` |
+| Browser diagnostics | `devtools-diagnostics.md`, `ui-network-capture.md` |
+| Courses | `course-project-workflows.md` plus the matching course reference |
+| Backups/diagrams | `backups-zstd.md`, `project-clone-restore.md`, or `$ks-diagram-roundtrip` |
+| Unknown work / adaptive context | `adaptive-context-packs.md`, `use-case-patterns.md` |
+| Safe execution | `safe-writes.md`, `safe-patch-workflow.md` |
+| Execution evidence | `execution-receipts.md`, `execution-receipt.schema.json` |
+
+Read `references/diagnostics-toolbox.md` when choosing a bundled audit or
+planning script, or when diagnosing an empty interface. Run a script for its
+output without loading its source unless the task is to modify that script.
+
+## Automation Preference
+
+- Reuse an existing bundled client, auditor, planner, or executor when it fits
+  the required effect; do not generate parallel infrastructure by default.
+- Use deterministic scripts for repetitive or fragile operations. Keep
+  context-dependent diagnosis and capability selection in Codex.
+- Prefer offline snapshots, diffs, dry runs, and linted plans before writes.
+- When no automation exists, solve the task safely first. Propose a reusable
+  tool only after the workflow and its safety boundary are understood.
+- Promote a new helper into the plugin only when it is reusable, redacted,
+  project-scoped, and does not bypass existing gates.
+
+## Evidence Retrieval And Learning
+
+Use `scripts/ks_knowledge.py` only with user-provided private cards and database
+roots. The derived SQLite FTS5 index stays outside the plugin and never changes
+KS.
+
+For retrieval:
+
+1. Query with discovered entities, endpoint families, KS version, symptom, and
+   intended effect rather than only the user's original wording.
+2. Start with one focused pass of up to five `verified` or `promoted` cards.
+   If an evidence gap remains, run another narrower pass; five is a per-pass
+   context bound, not a limit on the task's knowledge.
+3. Treat matches as evidence. Re-check UUIDs, dependencies, live state, and
+   version compatibility. Retrieval never grants permission.
+
+For learning from unfamiliar or corrected work:
+
+1. Prepare a `candidate` card only after the useful result and its safety
+   boundary are understood.
+2. Record a redacted problem signature, KS version/scope, affected entities and
+   endpoints, solution, evidence, rejected hypotheses, risk class, and
+   verification state.
+3. Write only to an explicitly supplied private cards root. Never persist raw
+   backups, HAR files, screenshots, credentials, customer data, unredacted
+   hostnames, or raw API responses.
+4. Promote a card to `verified` or `promoted` only after independent read-back,
+   browser evidence when material, and normalization for reuse.
+5. Do not automatically copy private learning into the public plugin. Public
+   promotion requires synthetic, stand-agnostic evidence and a separate review.
+
+Read `references/knowledge-card.schema.json` before creating cards and
+`references/self-learning.md` when maintaining the learning pipeline. Vector search
+is optional; it supplements rather than replaces exact API and safety checks.
 
 ## Common KS Diagnostics
 
-Empty interface blocks usually come from one of these, in order:
-
-1. Dashboard cells have no usable size/layout in `configuration.cells[*].settings.sizeAndContent`.
-2. Table cell points to the wrong `tableTable` or model.
-3. Data table constructor rows/columns reference the wrong class, dataset, indicator, dimension, or relation path.
-4. Data is missing for the exact dataset/object/indicator/dimensions shown in the table.
-5. Incoming event action is wrong:
-   - widget to ordinary object table: `filter`;
-   - selected object to relation-scoped table: usually `tableFilterStructure` with `filter.tableCellSettings`;
-   - object-card relation replacement: `changeRelationObject`;
-   - dictionary/dataset dimension filtering: often `tableFilterStructure`;
-   - nested dashboard placement: button emits `sendEntity`, nested dashboard cell listens with `getDashboard` + `place`;
-   - modal button opening: prefer `showDashboard` + `showType: inWindow` over imported legacy `getDashboard` + `modal`.
-6. Publication does not include the dashboard, or a modal dashboard is not included as hidden.
-7. Frontend cache/session is stale after config writes.
-8. The route uses the entity UUID as `node`; the KS UI often needs the real tree node UUID from `/dashboards/tree-get-down` or a tree click.
-9. A frontend component fails despite valid JSON. Check browser console and avoid relying on API state alone for widgets, charts, nested dashboards, and modals.
+For empty interfaces and constructor failures, read
+`references/diagnostics-toolbox.md`. Preserve the diagnostic order there; do
+not jump from a blank cell directly to a dashboard rewrite.
 
 ## Writing Style For User Updates
 
@@ -150,12 +218,3 @@ Report KS work as facts:
 - what remains unverified.
 
 Do not claim a project is complete until API checks and browser behavior both match the requested workflow.
-
-## Private Evidence Overlay
-
-If the user supplies a separate private overlay with redacted UI/API evidence,
-use it as empirical input for constructor payloads. Keep raw captures, customer
-identifiers, stand profiles and uncertain observations outside this public
-plugin. Promote a learned pattern only after normalization, safety
-classification and a synthetic regression; this skill's safety rules remain
-the governing policy.

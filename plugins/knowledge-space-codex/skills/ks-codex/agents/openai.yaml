@@ -1,6 +1,6 @@
 interface:
   display_name: "KS Codex"
-  short_description: "Safely inspect, edit, and verify KS projects"
-  default_prompt: "Use $ks-codex to audit this Knowledge Space project through the official API, propose safe project-scoped fixes, and mark any browser-only UI behavior that remains unverified."
+  short_description: "Safely inspect, build, repair, and verify KS projects"
+  default_prompt: "Use $ks-codex to inspect, build, repair, or verify this Knowledge Space task through the official API; choose Direct, Coordinated, or Discovery as needed, preserve project scope, and state every browser or live-verification boundary."
 policy:
   allow_implicit_invocation: true

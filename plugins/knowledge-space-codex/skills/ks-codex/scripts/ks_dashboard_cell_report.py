@@ -217,6 +217,19 @@ def event_summaries(cell: dict[str, Any]) -> list[str]:
     return sorted(Counter(summaries).elements())
 
 
+def runtime_verification_notes(cell: dict[str, Any], events: list[str]) -> list[str]:
+    """Describe behavior that a structural snapshot cannot prove."""
+    if entity_type(cell).casefold() != "iframe":
+        return []
+    notes = ["verify iframe DOM, console, and network in a browser"]
+    source = value_at_path(cell, ("entity", "iframeSrc"))
+    if not isinstance(source, str) or not source.strip() or source.strip().casefold() == "about:blank":
+        notes.append("iframe source is blank or dynamic in the snapshot")
+    if events:
+        notes.append("verify iframe behavior after its configured event trigger")
+    return notes
+
+
 def format_list(values: list[str], limit: int = 6) -> str:
     if not values:
         return "none"
@@ -247,6 +260,7 @@ def dashboard_rows(snapshot: dict[str, Any]) -> tuple[list[dict[str, Any]], dict
                 rects.append((title, rect))
             if ctype == "<blank>":
                 risks.append("blank entity type")
+            events = event_summaries(cell)
             rows.append(
                 {
                     "dashboard": dashboard_name,
@@ -257,8 +271,9 @@ def dashboard_rows(snapshot: dict[str, Any]) -> tuple[list[dict[str, Any]], dict
                     "rect": rect_text(rect),
                     "zIndex": value_at_path(cell, ("settings", "cellStyle", "zIndex")),
                     "refs": relevant_refs(cell),
-                    "events": event_summaries(cell),
+                    "events": events,
                     "risks": risks,
+                    "runtime_verification": runtime_verification_notes(cell, events),
                 }
             )
         for index, (title_a, rect_a) in enumerate(rects):
@@ -297,12 +312,13 @@ def render_markdown(snapshot: dict[str, Any]) -> str:
     for dashboard in sorted(by_dashboard):
         lines.append(f"## {dashboard}")
         lines.append("")
-        lines.append("| Cell | Type | Rect | zIndex | Refs | Events | Risks |")
-        lines.append("| --- | --- | --- | ---: | --- | --- | --- |")
+        lines.append("| Cell | Type | Rect | zIndex | Refs | Events | Risks | Runtime verification |")
+        lines.append("| --- | --- | --- | ---: | --- | --- | --- | --- |")
         for row in by_dashboard[dashboard]:
             lines.append(
                 f"| {row['cell']} | {row['type']} | {row['rect']} | {row['zIndex']} | "
-                f"{format_list(row['refs'], 4)} | {format_list(row['events'], 5)} | {format_list(row['risks'], 5)} |"
+                f"{format_list(row['refs'], 4)} | {format_list(row['events'], 5)} | "
+                f"{format_list(row['risks'], 5)} | {format_list(row['runtime_verification'], 5)} |"
             )
         lines.append("")
     return "\n".join(lines)

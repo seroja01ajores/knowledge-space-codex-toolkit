@@ -147,3 +147,10 @@ Use `scripts/ks_safe_patch_lint.py` to classify a patch plan offline before runn
 Use `scripts/ks_safe_patch_execute.py` only after linting when you have a JSON plan and explicit execution intent. The executor is deliberately narrow: it can execute read-only calls and exact-approved `project_write` operations with read-before/read-back checks. It defers `external_or_runtime`, `destructive_or_global`, `unknown`, and `server_or_db` operations to separate approved flows. This is a capability boundary for the generic project-write script, not a permanent ban on integrations, BPMS, imports/exports, recalculation, deletes, or server maintenance when the user intentionally requests them and the correct approval mode is active.
 
 Use `scripts/ks_approved_runtime_execute.py` for the separate `approved_runtime` flow. It can execute exact-approved runtime operations such as integration runs, connection checks, integration-table refresh/export/update, BPMS start/complete, and recalculation. It requires `metadata.mode=approved_runtime`, `approval.userApproved=true`, an approved operation id/endpoint, confirmed project UUID, `--execute`, and read-back/verification or a documented `verificationWaiver`. Use only dedicated `KS_RUNTIME_PAYLOAD_*` variables in `payloadEnv` entries for runtime secrets instead of storing passwords or tokens in plan JSON.
+
+After an executor writes execution_report.json or
+runtime_execution_report.json, build a compact receipt with
+`scripts/ks_execution_receipt.py`. The receipt binds the plan, report,
+operation states and artifact hashes for handoff or learning, but never carries
+the original approval, authorizes a retry, or replaces actual-effect
+classification. Read `execution-receipts.md` for the contract.
