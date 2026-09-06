@@ -560,6 +560,14 @@ def _card_search_text(card: dict[str, Any]) -> tuple[str, ...]:
     )
 
 
+def _canonical_card_json(card: dict[str, Any]) -> str:
+    return json.dumps(card, ensure_ascii=False, sort_keys=True)
+
+
+def _card_sha256(card: dict[str, Any]) -> str:
+    return hashlib.sha256(_canonical_card_json(card).encode("utf-8")).hexdigest()
+
+
 def _create_database(path: Path, cards: Iterable[dict[str, Any]]) -> int:
     card_list = list(cards)
     connection = sqlite3.connect(path)
@@ -630,8 +638,8 @@ def _create_database(path: Path, cards: Iterable[dict[str, Any]]) -> int:
             ),
         )
         for card in sorted(card_list, key=lambda item: item["id"]):
-            serialized = json.dumps(card, ensure_ascii=False, sort_keys=True)
-            digest = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+            serialized = _canonical_card_json(card)
+            digest = _card_sha256(card)
             applicability = card.get("applicability", {})
             freshness = card.get("freshness", {})
             review_after = freshness.get("reviewAfter")
@@ -755,6 +763,172 @@ def _query_tokens(value: str) -> list[str]:
     return tokens
 
 
+def _connect_index_readonly(path: Path) -> sqlite3.Connection:
+    uri = f"file:{quote(str(path), safe='/')}?mode=ro&immutable=1"
+    connection: sqlite3.Connection | None = None
+    try:
+        connection = sqlite3.connect(uri, uri=True)
+        connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA query_only = ON")
+        metadata = dict(connection.execute("SELECT key, value FROM metadata"))
+        if metadata.get("format") != "teamvalue.ks-knowledge-index":
+            raise KnowledgeError("unsupported knowledge database format")
+        if metadata.get("formatVersion") != INDEX_VERSION:
+            raise KnowledgeError(
+                "knowledge database must be rebuilt for index format 1.1"
+            )
+        return connection
+    except KnowledgeError:
+        if connection is not None:
+            connection.close()
+        raise
+    except sqlite3.DatabaseError as exc:
+        if connection is not None:
+            connection.close()
+        raise KnowledgeError("knowledge database could not be opened safely") from exc
+
+
+def _reuse_assessment(
+    card: dict[str, Any],
+    *,
+    as_of: datetime,
+    ks_version: str | None,
+    require_portable: bool,
+) -> dict[str, Any]:
+    state = freshness_state(card, as_of=as_of)
+    blockers: list[str] = []
+    if card["schemaVersion"] != "1.1":
+        blockers.append("legacy-schema")
+    if card["status"] not in {"verified", "promoted"}:
+        blockers.append(f"status:{card['status']}")
+    if state != "fresh":
+        blockers.append(f"freshness:{state}")
+    if require_portable and card["scope"] != "portable":
+        blockers.append(f"scope:{card['scope']}")
+    if ks_version is not None and ks_version not in card["ksVersions"]:
+        blockers.append("ks-version-mismatch")
+    remaining_unknowns = card.get("learning", {}).get("remainingUnknowns", [])
+    if remaining_unknowns:
+        blockers.append("remaining-unknowns")
+    return {
+        "disposition": (
+            "requires-live-compatibility-check"
+            if not blockers
+            else "hypothesis-only"
+        ),
+        "fastPathBlockers": blockers,
+        "freshness": state,
+        "requestedKsVersion": ks_version,
+        "requiresPortableScope": require_portable,
+        "requiredGate": card.get("applicability", {}).get("requiredGate"),
+        "livePreconditions": list(card["preconditions"]),
+    }
+
+
+def _full_card_result(
+    card: dict[str, Any],
+    *,
+    digest: str,
+    source: str,
+    as_of: datetime,
+    ks_version: str | None,
+    require_portable: bool,
+) -> dict[str, Any]:
+    return {
+        "format": "teamvalue.ks-knowledge-card",
+        "formatVersion": "1.0",
+        "source": source,
+        "cardSha256": digest,
+        "reuseAssessment": _reuse_assessment(
+            card,
+            as_of=as_of,
+            ks_version=ks_version,
+            require_portable=require_portable,
+        ),
+        "card": card,
+        "offlineOnly": True,
+        "authenticatesProvenance": False,
+        "authorizesExecution": False,
+    }
+
+
+def inspect_card(
+    cards_root: Path,
+    card: str | Path,
+    *,
+    ks_version: str | None = None,
+    require_portable: bool = False,
+    as_of: str | None = None,
+) -> dict[str, Any]:
+    root = _safe_root(cards_root)
+    path = _resolve_file(root, card, label="card")
+    value = validate_card(_read_card(path), filename=path.name)
+    return _full_card_result(
+        value,
+        digest=_card_sha256(value),
+        source="card-file",
+        as_of=_as_of(as_of),
+        ks_version=ks_version,
+        require_portable=require_portable,
+    )
+
+
+def _validated_index_card(row: sqlite3.Row, card_id: str) -> dict[str, Any]:
+    try:
+        raw = strict_json_loads(row["card_json"])
+    except SafePathError as exc:
+        raise KnowledgeError("indexed knowledge card is not strict JSON") from exc
+    if not isinstance(raw, dict):
+        raise KnowledgeError("indexed knowledge card must be a JSON object")
+    value = validate_card(raw)
+    if value["id"] != card_id:
+        raise KnowledgeError("indexed knowledge card id is inconsistent")
+    if _card_sha256(value) != row["card_sha256"]:
+        raise KnowledgeError("indexed knowledge card content hash is inconsistent")
+    return value
+
+
+def get_index_card(
+    database_root: Path,
+    database: str | Path,
+    card_id: str,
+    expected_sha256: str,
+    *,
+    ks_version: str | None = None,
+    require_portable: bool = False,
+    as_of: str | None = None,
+) -> dict[str, Any]:
+    if not ID_RE.fullmatch(card_id):
+        raise KnowledgeError("card id must use lower-case kebab-case")
+    if not SHA256_RE.fullmatch(expected_sha256):
+        raise KnowledgeError("expected card SHA-256 is invalid")
+    root = _safe_root(database_root)
+    path = _resolve_file(root, database, label="database")
+    connection = _connect_index_readonly(path)
+    try:
+        row = connection.execute(
+            "SELECT card_sha256, card_json FROM cards WHERE id = ?",
+            (card_id,),
+        ).fetchone()
+    except sqlite3.DatabaseError as exc:
+        raise KnowledgeError("knowledge database card lookup failed") from exc
+    finally:
+        connection.close()
+    if row is None:
+        raise KnowledgeError("knowledge card was not found")
+    if row["card_sha256"] != expected_sha256:
+        raise KnowledgeError("knowledge card hash does not match search evidence")
+    value = _validated_index_card(row, card_id)
+    return _full_card_result(
+        value,
+        digest=row["card_sha256"],
+        source="knowledge-index",
+        as_of=_as_of(as_of),
+        ks_version=ks_version,
+        require_portable=require_portable,
+    )
+
+
 def search_index(
     database_root: Path,
     database: str | Path,
@@ -766,6 +940,7 @@ def search_index(
     scopes: list[str] | None = None,
     statuses: list[str] | None = None,
     include_review_due: bool = False,
+    ready_only: bool = False,
     as_of: str | None = None,
     limit: int = MAX_RESULTS,
 ) -> dict[str, Any]:
@@ -819,7 +994,8 @@ def search_index(
     if not include_review_due:
         where.append("(c.review_after IS NULL OR c.review_after >= ?)")
         parameters.append(effective_as_of_text)
-    parameters.append(limit)
+    if not ready_only:
+        parameters.append(limit)
     statement = f"""
         SELECT
             c.id,
@@ -834,6 +1010,7 @@ def search_index(
             c.required_gate,
             c.review_after,
             c.card_sha256,
+            {'c.card_json,' if ready_only else ''}
             bm25(cards_fts) AS relevance
         FROM cards_fts
         JOIN cards c ON c.id = cards_fts.card_id
@@ -843,25 +1020,31 @@ def search_index(
             relevance ASC,
             c.confidence DESC,
             c.id ASC
-        LIMIT ?
+        {'' if ready_only else 'LIMIT ?'}
     """
-    uri = f"file:{quote(str(path), safe='/')}?mode=ro&immutable=1"
+    connection = _connect_index_readonly(path)
     try:
-        connection = sqlite3.connect(uri, uri=True)
-        connection.row_factory = sqlite3.Row
-        metadata = dict(connection.execute("SELECT key, value FROM metadata"))
-        if metadata.get("format") != "teamvalue.ks-knowledge-index":
-            raise KnowledgeError("unsupported knowledge database format")
-        if metadata.get("formatVersion") != INDEX_VERSION:
-            raise KnowledgeError(
-                "knowledge database must be rebuilt for index format 1.1"
-            )
-        rows = list(connection.execute(statement, parameters))
+        rows = []
+        for row in connection.execute(statement, parameters):
+            if ready_only:
+                card = _validated_index_card(row, row["id"])
+                if any(
+                    _reuse_assessment(
+                        card,
+                        as_of=effective_as_of,
+                        ks_version=version,
+                        require_portable=set(scopes or []) == {"portable"},
+                    )["fastPathBlockers"]
+                    for version in ks_versions or [None]
+                ):
+                    continue
+            rows.append(row)
+            if len(rows) == limit:
+                break
     except sqlite3.DatabaseError as exc:
         raise KnowledgeError("knowledge database search failed") from exc
     finally:
-        if "connection" in locals():
-            connection.close()
+        connection.close()
     return {
         "format": "teamvalue.ks-knowledge-search",
         "formatVersion": "1.0",
@@ -873,6 +1056,7 @@ def search_index(
             "scopes": scopes or [],
             "statuses": requested_statuses,
             "includeReviewDue": include_review_due,
+            "readyOnly": ready_only,
             "asOf": effective_as_of_text,
         },
         "resultCount": len(rows),
@@ -908,6 +1092,8 @@ def search_index(
             for row in rows
         ],
         "offlineOnly": True,
+        "authenticatesProvenance": False,
+        "authorizesExecution": False,
     }
 
 
@@ -986,8 +1172,25 @@ def _parser() -> argparse.ArgumentParser:
     search_parser.add_argument("--scope", action="append", default=[])
     search_parser.add_argument("--status", action="append", default=[])
     search_parser.add_argument("--include-review-due", action="store_true")
+    search_parser.add_argument("--ready-only", action="store_true")
     search_parser.add_argument("--as-of")
     search_parser.add_argument("--limit", type=int, default=MAX_RESULTS)
+
+    inspect_parser = subparsers.add_parser("inspect-card")
+    inspect_parser.add_argument("--cards-root", type=Path, required=True)
+    inspect_parser.add_argument("--card", required=True)
+    inspect_parser.add_argument("--ks-version")
+    inspect_parser.add_argument("--require-portable", action="store_true")
+    inspect_parser.add_argument("--as-of")
+
+    get_parser = subparsers.add_parser("get-card")
+    get_parser.add_argument("--database-root", type=Path, required=True)
+    get_parser.add_argument("--database", required=True)
+    get_parser.add_argument("--card-id", required=True)
+    get_parser.add_argument("--expected-sha256", required=True)
+    get_parser.add_argument("--ks-version")
+    get_parser.add_argument("--require-portable", action="store_true")
+    get_parser.add_argument("--as-of")
 
     promotion_parser = subparsers.add_parser("promotion-check")
     promotion_parser.add_argument("--cards-root", type=Path, required=True)
@@ -1025,8 +1228,27 @@ def main(argv: list[str] | None = None) -> int:
                 scopes=args.scope,
                 statuses=args.status or None,
                 include_review_due=args.include_review_due,
+                ready_only=args.ready_only,
                 as_of=args.as_of,
                 limit=args.limit,
+            )
+        elif args.command == "inspect-card":
+            result = inspect_card(
+                args.cards_root,
+                args.card,
+                ks_version=args.ks_version,
+                require_portable=args.require_portable,
+                as_of=args.as_of,
+            )
+        elif args.command == "get-card":
+            result = get_index_card(
+                args.database_root,
+                args.database,
+                args.card_id,
+                args.expected_sha256,
+                ks_version=args.ks_version,
+                require_portable=args.require_portable,
+                as_of=args.as_of,
             )
         elif args.command == "promotion-check":
             root = _safe_root(args.cards_root)

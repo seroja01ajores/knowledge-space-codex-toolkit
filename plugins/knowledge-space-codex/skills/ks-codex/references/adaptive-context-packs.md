@@ -29,17 +29,24 @@ domains represented in the complete plan.
 
 ## Lifecycle
 
-1. Print the compact catalog.
-2. Let Codex select capability and operation IDs semantically.
-3. Validate the structured request into a task plan outside the plugin.
-4. Build a context pack for the current phase.
-5. Read only the listed references. Execute a listed script without reading its
+1. Inspect an exact supplied card or run one focused search when an explicit
+   private knowledge root is available. Resolve at most one selected full
+   recipe by ID and SHA-256 before broad current-state reads.
+2. Print the compact catalog only when the map in SKILL.md is insufficient.
+3. Let Codex select capability and operation IDs semantically.
+4. Validate the structured request into a task plan outside the plugin. A
+   requested retrieval phase precedes `read-current-state` and narrows its
+   target, dependencies, and preconditions. The planner uses `bind` or
+   `read-target` operations for exact read-before dependencies when available;
+   it does not silently substitute an area or project audit.
+5. Build a context pack for the current phase.
+6. Read only the listed references. Execute a listed script without reading its
    source unless the task is to modify or diagnose that script.
-6. Classify the real endpoint, payload, channel, and expected effect before any
+7. Classify the real endpoint, payload, channel, and expected effect before any
    action.
-7. Retain UUID-bound facts, unknowns, approvals, artifacts, and verification
+8. Retain UUID-bound facts, unknowns, approvals, artifacts, and verification
    status.
-8. Rebuild the pack when evidence changes or execution moves to another phase.
+9. Rebuild the pack when evidence changes or execution moves to another phase.
 
 Example commands:
 
@@ -74,7 +81,8 @@ resource, a duplicate phase, or a recognized secret representation is rejected.
 
 ## Unknown Tasks
 
-When no stable capability covers the request, use capability-discovery.
+When no supplied, private, bundled, or exact-project known path applies and no
+stable capability covers the request, use capability-discovery.
 Select only the evidence channels actually needed:
 
 - inspect-api for API map, OpenAPI, project scope, and observed endpoint
@@ -90,7 +98,9 @@ one-area or five-area ceiling.
 
 Discovery must stop when enough evidence exists to switch to Direct or
 Coordinated execution. It must not invent an endpoint, infer permission from a
-similar task, or turn private evidence into public plugin knowledge.
+similar task, or turn private evidence into public plugin knowledge. Missing
+credentials, network, or approval pause the task and do not prove a capability
+gap.
 
 ## Resume And Handoff
 

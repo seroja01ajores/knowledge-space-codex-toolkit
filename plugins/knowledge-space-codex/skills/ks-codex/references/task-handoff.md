@@ -1,7 +1,9 @@
 # Task Handoff And Resume
 
 Use a task handoff when Coordinated work continues in another Codex task,
-resumes after approval, or must discard bulky evidence before the next phase.
+resumes without the needed working context, or must discard bulky evidence
+before the next phase. An approval reply in a continuing Direct task does not
+require a handoff.
 
 The handoff is a compact local artifact. It is not a transcript, backup,
 credential store, execution request, or proof that an action succeeded.

@@ -48,6 +48,8 @@ Run scripts for their output; do not load source code unless adapting the tool.
 | Verified analyst-description targets | `ks_comment_audit.py` |
 | Publication inner-node dry run | `ks_publication_patch_plan.py` |
 | Patch effect and gate classification | `ks_safe_patch_lint.py` |
+| Portable/private card lookup and full recipe | `ks_knowledge.py` |
+| Offline workflow-policy trace check; not task acceptance | `ks_workflow_trace.py` |
 
 For generated patch batches or approved runtime effects, follow
 `safe-patch-workflow.md`; this catalog does not grant execution permission.

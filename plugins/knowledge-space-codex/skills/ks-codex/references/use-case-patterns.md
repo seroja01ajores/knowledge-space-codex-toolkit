@@ -27,8 +27,11 @@ Describe the task through observable decisions rather than terminology:
 7. Reuse: one-time result, resumable plan, reusable report, deterministic
    helper, private knowledge candidate, or public stand-agnostic pattern.
 
-Choose Direct, Coordinated, or Discovery from those facts. A task can change
-mode as evidence develops. Do not limit the number of capability areas.
+Before choosing broad Discovery, check whether an exact supplied card, fresh
+private card, bundled deterministic pattern, or working project analogue
+already describes the outcome and effect. Choose Direct, Coordinated, or
+Discovery from the resulting facts. A task can change mode as evidence
+develops. Do not limit the number of capability areas.
 
 ## Operating patterns
 
@@ -174,8 +177,9 @@ convert an incident diagnosis into a broad rewrite.
 
 ## Discovery contract
 
-When no current area pattern explains the request, produce a compact capability
-gap:
+Discovery starts only after known paths are absent, exhausted, or contradicted.
+Record the exact reason first. When no current area pattern explains the
+request, produce a compact capability gap:
 
 - requested observable outcome;
 - discovered entities, endpoints, and versions;
@@ -190,12 +194,22 @@ gap:
 Discovery remains read-only until an actual endpoint, payload, target, effect,
 and approval boundary are known. A new user term does not require a vocabulary
 entry. Prefer observed structures and effects over adding linguistic rules.
+Unavailable credentials, network, or approval pause the current route; they do
+not prove that a new technical solution is required.
 
 ## Learning contract
 
-Search verified or promoted cards only after scope, version, entities, and
-effect are known. Use multiple focused passes when different phases require
-different evidence; the per-pass result bound is not a task-wide knowledge cap.
+Use two-pass retrieval. Search verified or promoted cards early from intent,
+symptom, named entity, likely capability, and effect before broad project
+inspection. Resolve one hash-bound full recipe, then collect only the minimal
+stand fingerprint, target UUID, dependencies, and preconditions required to
+check compatibility. If the result is ambiguous or incompatible, run a second
+narrower pass with the observed version, endpoint family, entity type, or
+mismatch. The per-pass result bound is not a task-wide knowledge cap.
+
+An exact user-supplied portable card has priority over index search. Stale,
+legacy, non-portable, or version-mismatched evidence may guide a hypothesis but
+must not enter the Mechanical Fast Path. Retrieval never grants permission.
 
 Prepare a candidate only when it adds a reusable decision, payload invariant,
 diagnostic distinction, compatibility boundary, or safety rule. Preserve
@@ -211,8 +225,9 @@ redacted, and independently reviewed.
 - Routine Direct work should not load this reference.
 - Coordinated work loads all required short capability contracts but only the
   current phase's detailed references.
-- Discovery expands context incrementally from API map to official UI evidence
-  and only then to permitted server diagnostics.
+- Discovery expands context only after known-path exhaustion, then incrementally
+  from API map to official UI evidence and only then to permitted server
+  diagnostics.
 - More capability areas are allowed whenever the causal chain requires them.
 - Completed evidence is reduced, not discarded; raw sensitive data is removed
   while hashes, UUIDs, findings, and provenance remain.

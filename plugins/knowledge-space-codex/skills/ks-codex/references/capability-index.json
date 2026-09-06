@@ -72,13 +72,29 @@
       ],
       "references": [
         "api-client-patterns.md",
-        "api-map.md",
-        "project-audit.md"
+        "api-map.md"
       ],
       "operations": [
         {
+          "id": "bind",
+          "risk": "read_only",
+          "scripts": [
+            "ks_environment_preflight.py"
+          ],
+          "outputs": [
+            "stand and project binding"
+          ],
+          "verification": [
+            "project UUID confirmed",
+            "API errors unwrapped"
+          ]
+        },
+        {
           "id": "inspect",
           "risk": "read_only",
+          "references": [
+            "project-audit.md"
+          ],
           "scripts": [
             "ks_environment_preflight.py",
             "ks_readonly_audit_runner.py",
@@ -113,6 +129,17 @@
         "ui-observed-builder.md"
       ],
       "operations": [
+        {
+          "id": "read-target",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "exact model or data entity and direct dependencies"
+          ],
+          "verification": [
+            "target UUID and direct references resolve"
+          ]
+        },
         {
           "id": "inspect",
           "risk": "read_only",
@@ -157,6 +184,17 @@
         "payload-examples.md"
       ],
       "operations": [
+        {
+          "id": "read-target",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "exact indicator or formula definition and direct dependencies"
+          ],
+          "verification": [
+            "target UUID and direct references resolve"
+          ]
+        },
         {
           "id": "inspect",
           "risk": "read_only",
@@ -216,6 +254,17 @@
       ],
       "operations": [
         {
+          "id": "read-target",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "exact table constructor and direct dependencies"
+          ],
+          "verification": [
+            "target UUID and direct references resolve"
+          ]
+        },
+        {
           "id": "inspect",
           "risk": "read_only",
           "scripts": [
@@ -260,6 +309,17 @@
       ],
       "operations": [
         {
+          "id": "read-target",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "exact dashboard and directly referenced cells or entities"
+          ],
+          "verification": [
+            "target dashboard UUID and direct references resolve"
+          ]
+        },
+        {
           "id": "inspect",
           "risk": "read_only",
           "scripts": [
@@ -275,6 +335,9 @@
         {
           "id": "change",
           "risk": "project_write",
+          "references": [
+            "mechanical-fast-path.md"
+          ],
           "scripts": [
             "ks_dashboard_layout_plan.py"
           ],
@@ -304,6 +367,17 @@
         "payload-examples.md"
       ],
       "operations": [
+        {
+          "id": "read-target",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "exact publication or Gantt artifact and direct dependencies"
+          ],
+          "verification": [
+            "target UUID and direct references resolve"
+          ]
+        },
         {
           "id": "inspect",
           "risk": "read_only",
@@ -347,6 +421,17 @@
         "integrations-patterns.md"
       ],
       "operations": [
+        {
+          "id": "read-target",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "exact integration configuration and direct dependencies"
+          ],
+          "verification": [
+            "target integration UUID and operation resolve"
+          ]
+        },
         {
           "id": "inspect",
           "risk": "read_only",
@@ -415,6 +500,17 @@
         "bpms-patterns.md"
       ],
       "operations": [
+        {
+          "id": "read-target",
+          "risk": "read_only",
+          "scripts": [],
+          "outputs": [
+            "exact BPMS process or task configuration and direct dependencies"
+          ],
+          "verification": [
+            "target process or task UUID resolves"
+          ]
+        },
         {
           "id": "inspect",
           "risk": "read_only",
@@ -665,17 +761,20 @@
       "requires": [],
       "oftenWith": [],
       "references": [
-        "knowledge-card.schema.json"
+        "knowledge-card.schema.json",
+        "self-learning.md",
+        "known-path-first.md"
       ],
       "operations": [
         {
           "id": "search",
-          "risk": "local_artifact_write",
+          "risk": "read_only",
           "scripts": [
             "ks_knowledge.py"
           ],
           "outputs": [
-            "bounded verified or promoted evidence set"
+            "bounded verified or promoted evidence set",
+            "one hash-bound full-card recipe"
           ],
           "verification": [
             "scope, version, and live state rechecked"

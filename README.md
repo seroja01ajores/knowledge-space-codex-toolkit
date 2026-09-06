@@ -25,7 +25,7 @@
 проектов, клиентских данных, логинов, паролей, токенов, cookie, SSH-ключей или
 реальных резервных копий.
 
-Текущая релизная линия: **v0.5.0**.
+Текущий релиз: **v0.5.1**.
 
 ### Что даёт плагин
 
@@ -33,7 +33,7 @@
 | --- | --- |
 | Разобраться в незнакомом проекте KS | Создаёт снимок через API в режиме чтения и проверяет структуру и доступные артефакты интерфейса |
 | Выполнить задачу, связанную с несколькими разделами KS | Строит единый план без ограничения числа доменов и загружает подробные инструкции по фазам |
-| Решить задачу, которой раньше не было в навыке | Начинает с безопасного Discovery, находит фактические сущности и эффекты, затем формирует новый проверяемый маршрут |
+| Решить задачу, которой раньше не было в навыке | Сначала проверяет известные решения; при отсутствии совместимого маршрута переходит в Discovery |
 | Найти ранее проверенное решение | Ищет компактные карточки опыта в локальном приватном индексе без отправки данных во внешний сервис |
 | Разделить фильтры пользователей во встроенном iframe | Разделяет состояние браузера, KS и внешнего сервиса, проектирует сессионный контракт и проверку двух независимых сессий |
 | Построить карту влияния или отчёт о здоровье проекта | Собирает source-bound lineage, события интерфейса, приоритетные дефекты и безопасные варианты исправления |
@@ -63,6 +63,8 @@
 ### Адаптивная модель работы
 
 - **Direct** применяется, когда сущность, цель, проект и проверка уже понятны.
+  Для одной детерминированной правки Mechanical Fast Path обычно требует два
+  чтения и одну запись, без полного снимка проекта и постоянного плана.
 - **Coordinated** применяется для нескольких зависимых областей, runtime,
   подтверждений, возобновления плана или аудиторского следа.
 - **Discovery** применяется для неизвестной сущности или эффекта и остаётся на
@@ -74,6 +76,16 @@ Codex интерпретирует естественный язык самос�
 зависимости, реальные endpoint/payload и бизнес-эффект. Численного ограничения
 на количество областей нет; подробные материалы загружаются только для текущей
 фазы.
+
+### Что изменено в v0.5.1
+
+- Проверенное решение ищется до исследования стенда; полный аудит запускается
+  по конкретной причине или запросу пользователя.
+- `search --ready-only` отбирает пригодные карточки до ограничения выдачи.
+  `get-card` и `inspect-card` загружают точный рецепт с проверкой хеша.
+- Mechanical Fast Path использует один клиент и одного исполнителя;
+  офлайн-проверка маршрута предупреждает о лишних чтениях без причины.
+- Передача контекста не требуется для обычного продолжения Direct-задачи.
 
 ### Что добавлено в v0.5.0
 
@@ -172,7 +184,7 @@ python3 plugins/knowledge-space-codex/skills/ks-codex/scripts/ks_environment_pre
 marketplace. Для воспроизводимой установки ниже зафиксирован проверенный релиз:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.5.0
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.5.1
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 
@@ -284,7 +296,7 @@ The toolkit combines two complementary workflows:
 The repository contains no fixed KS host, project UUID, customer data,
 credential, token, cookie or real project backup.
 
-Current release line: **v0.5.0**.
+Current release: **v0.5.1**.
 
 ### Why it is useful
 
@@ -292,7 +304,7 @@ Current release line: **v0.5.0**.
 | --- | --- |
 | Understand an unfamiliar KS project | Read-only API snapshot plus structural and UI artifact audits |
 | Solve a task spanning several KS areas | Build one unbounded domain plan and load detailed guidance phase by phase |
-| Solve a task not previously covered by the skill | Start with safe Discovery, identify actual entities and effects, then produce a verifiable new route |
+| Solve a task not previously covered by the skill | Check known solutions first; enter Discovery when no compatible route remains |
 | Reuse a verified prior solution | Search compact experience cards in a local private index without an external service |
 | Isolate filters for users inside an iframe | Separate browser, KS and external-service state, design a session contract and verify two independent sessions |
 | Build an impact map or project health report | Produce source-bound lineage, interface event flow, prioritized defects and safe repair options |
@@ -306,6 +318,8 @@ Current release line: **v0.5.0**.
 ### Adaptive operating model
 
 - **Direct** handles a clear entity, outcome, project and verification target.
+  A deterministic single-entity Mechanical Fast Path normally uses two reads
+  and one write, without a full project snapshot or persistent plan.
 - **Coordinated** handles dependent areas, runtime effects, approvals, resume or
   audit trails.
 - **Discovery** handles an unknown entity or effect and remains read-only until
@@ -315,6 +329,16 @@ Codex interprets natural language. Scripts validate selected capability IDs,
 dependencies, actual endpoints, payloads and business effects rather than
 guessing intent from keywords. There is no numeric area cap; detailed
 references load only for the active phase.
+
+### What v0.5.1 changes
+
+- Verified known routes precede stand discovery; broader audits require a
+  concrete reason or an explicit request.
+- `search --ready-only` filters reusable cards before limiting results.
+  `get-card` and `inspect-card` load exact recipes with hash verification.
+- Mechanical Fast Path uses one client and one writer; offline workflow
+  validation warns about extra reads without a stated reason.
+- Ordinary Direct continuation does not require a task handoff.
 
 ### What v0.5.0 adds
 
@@ -393,7 +417,7 @@ the global OpenAI plugin catalog. Other users install it from this GitHub
 marketplace. The command below pins the reviewed release for reproducibility:
 
 ```bash
-codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.5.0
+codex plugin marketplace add seroja01ajores/knowledge-space-codex-toolkit --ref v0.5.1
 codex plugin add knowledge-space-codex@ks-agent-local
 ```
 

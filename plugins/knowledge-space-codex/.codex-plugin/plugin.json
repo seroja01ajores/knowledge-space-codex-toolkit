@@ -1,6 +1,6 @@
 {
   "name": "knowledge-space-codex",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Portable Codex plugin for auditing, building, verifying, and diagramming Knowledge Space projects.",
   "author": {
     "name": "TeamValue"
@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "Knowledge Space Codex",
     "shortDescription": "Audit, build, verify, and diagram KS projects safely.",
-    "longDescription": "A stand-agnostic Knowledge Space toolkit for API-first project audits, safe project-scoped edits, adaptive Direct/Coordinated/Discovery work, unbounded multi-area diagnostics, phase-scoped context packs, resumable handoffs, evidence lifecycle management, execution receipts, course and scratch-project reconstruction, browser-assisted verification, session-scoped dynamic IFRAME routing, external web-service contracts, and an offline manifest-bound KS backup to Diagramm JSON round-trip. The diagram workflow supports schema 1.2, semantic relationship normalization, read-only indicator and formula provenance, non-numeric indicator presentation as attributes, per-class object counts, source-bound change plans, structural validation, cloned-backup packing, and isolated restore/read-back gates. Planning, retrieved knowledge, handoffs, and receipts never authorize execution: runtime actions use exact-approved flows, while destructive or live restore actions require separate target-specific approval.",
+    "longDescription": "A stand-agnostic Knowledge Space toolkit for known-solution-first API work, portable knowledge-card reuse, fast deterministic Direct changes, adaptive project audits, single-writer subagent coordination, safe project-scoped edits, unbounded multi-area diagnostics, phase-scoped context packs, resumable handoffs, evidence lifecycle management, execution receipts, course and scratch-project reconstruction, browser-assisted verification, session-scoped dynamic IFRAME routing, external web-service contracts, and an offline manifest-bound KS backup to Diagramm JSON round-trip. The diagram workflow supports schema 1.2, semantic relationship normalization, read-only indicator and formula provenance, non-numeric indicator presentation as attributes, per-class object counts, source-bound change plans, structural validation, cloned-backup packing, and isolated restore/read-back gates. Planning, retrieved knowledge, handoffs, traces, and receipts never authorize execution: runtime actions use exact-approved flows, while destructive or live restore actions require separate target-specific approval.",
     "developerName": "TeamValue",
     "category": "Productivity",
     "capabilities": [
@@ -38,6 +38,9 @@
       "Adaptive Context Packs",
       "Resumable Task Handoffs",
       "Local Knowledge Retrieval",
+      "Known Solution Reuse",
+      "Mechanical Fast Path",
+      "Single-writer Subagent Coordination",
       "Evidence Lifecycle",
       "Execution Receipts",
       "Discovery Workflows",
@@ -51,7 +54,8 @@
       "Recreate or verify this KS course project.",
       "Prepare a KS backup to Diagramm round-trip.",
       "Configure per-session dynamic IFRAME routing in a KS dashboard.",
-      "Design a multi-user contract between a KS interface and an external service."
+      "Design a multi-user contract between a KS interface and an external service.",
+      "Apply this portable KS knowledge card through the smallest compatible route."
     ],
     "brandColor": "#4B3A75"
   }

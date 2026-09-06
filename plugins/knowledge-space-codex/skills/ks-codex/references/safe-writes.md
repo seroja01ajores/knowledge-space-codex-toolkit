@@ -7,7 +7,9 @@ Use this file before any create/update/save call.
 1. Confirm target `KS_PROJECT_UUID`.
 2. Read current entity through API.
 3. Prepare a minimal patch in memory.
-4. Print a dry-run summary unless the user already authorized execution.
+4. Print a dry-run summary. When the user already authorized the exact
+   operation, this is an informational checkpoint rather than a second approval
+   request.
 5. Use official API write endpoint.
 6. Verify by reading the same entity again.
 7. Record changed UUIDs and fields in the final response.
@@ -39,6 +41,11 @@ def api(session, base, path, payload):
 ## Safe Patch Plans
 
 For non-trivial changes, generated patches, batch work, runtime actions, destructive actions, or anything learned from UI/API capture, create a safe patch plan first. See `safe-patch-workflow.md`.
+
+For an eligible Mechanical Fast Path, keep the same target read, micro dry-run,
+single write, and read-back guardrails without generating a separate persistent
+plan or broad audit bundle. Read `mechanical-fast-path.md`. Exit that route as
+soon as the target, effect, dependency, or observed delta becomes uncertain.
 
 Safe patch is a risk gate, not a permanent ban. Integration runs, BPMS starts, imports/exports, deletes, and access changes can be valid work when intentionally requested, scoped to the right project/stand, and approved at the matching risk level. Generic continuation instructions are not enough for those actions.
 
@@ -157,4 +164,3 @@ Forbidden during project work:
 - backup restore/load;
 - role/user/global access edits;
 - file edits on the server.
-

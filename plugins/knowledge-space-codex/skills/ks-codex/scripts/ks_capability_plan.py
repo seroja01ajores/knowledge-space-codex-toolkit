@@ -34,6 +34,7 @@ RISK_ORDER = {
     "server_or_db": 5,
 }
 ALLOWED_PHASES = {"analysis", "change", "runtime", "verification"}
+NARROW_READ_OPERATIONS = ("bind", "read-target", "inspect")
 ALLOWED_VERIFICATION = {
     "api-readback",
     "browser",
@@ -544,6 +545,19 @@ def _expand_capabilities(
     by_id = _areas_by_id(index)
     entries: dict[tuple[str, str], dict[str, Any]] = {}
 
+    def narrow_read_operation(area_id: str) -> str | None:
+        operation_ids = {
+            operation["id"] for operation in by_id[area_id]["operations"]
+        }
+        return next(
+            (
+                candidate
+                for candidate in NARROW_READ_OPERATIONS
+                if candidate in operation_ids
+            ),
+            None,
+        )
+
     def add(
         area_id: str, operation_id: str, selection: str, reason: str
     ) -> None:
@@ -579,18 +593,29 @@ def _expand_capabilities(
 
     def add_dependencies(area_id: str) -> None:
         for required in by_id[area_id].get("requires", []):
-            add(required, "inspect", "dependency", f"required-by:{area_id}")
+            read_operation = narrow_read_operation(required)
+            if read_operation is None:
+                raise CapabilityPlanError(
+                    f"required area {required} has no safe read operation"
+                )
+            add(
+                required,
+                read_operation,
+                "dependency",
+                f"required-by:{area_id}",
+            )
             add_dependencies(required)
 
     for selected in request["capabilities"]:
         add(selected["id"], selected["operation"], "direct", "selected-by-codex")
-        area_operations = {
-            operation["id"] for operation in by_id[selected["id"]]["operations"]
-        }
-        if selected["operation"] != "inspect" and "inspect" in area_operations:
+        read_operation = narrow_read_operation(selected["id"])
+        if (
+            read_operation is not None
+            and selected["operation"] not in NARROW_READ_OPERATIONS
+        ):
             add(
                 selected["id"],
-                "inspect",
+                read_operation,
                 "read-before",
                 f"read-before:{selected['operation']}",
             )
@@ -609,7 +634,7 @@ def _expand_capabilities(
 
 def _max_risk(entries: list[dict[str, Any]], knowledge: dict[str, bool]) -> str:
     risks = [entry["risk"] for entry in entries if entry["selection"] == "direct"]
-    if knowledge["search"] or knowledge["captureCandidate"]:
+    if knowledge["captureCandidate"]:
         risks.append("local_artifact_write")
     if not risks:
         return "read_only"
@@ -635,8 +660,8 @@ def build_plan(
     direct_entries = [
         entry for entry in entries if entry["selection"] == "direct"
     ]
-    inspect_entries = [
-        entry for entry in entries if entry["operation"] == "inspect"
+    read_entries = [
+        entry for entry in entries if entry["operation"] in NARROW_READ_OPERATIONS
     ]
     selected_area_ids = sorted(
         {entry["id"] for entry in entries},
@@ -648,42 +673,55 @@ def build_plan(
     )
 
     phases: list[dict[str, Any]] = []
-    if inspect_entries:
-        phases.append(
-            {
-                "id": "read-current-state",
-                "objective": "Establish UUID-bound current state and prerequisites",
-                "capabilities": [
-                    f"{entry['id']}.{entry['operation']}"
-                    for entry in inspect_entries
-                ],
-                "references": _resource_union(
-                    *[entry["references"] for entry in inspect_entries]
-                ),
-                "scripts": _resource_union(
-                    *[entry["scripts"] for entry in inspect_entries]
-                ),
-                "gates": ["project-scoped read-only"],
-                "outputs": _resource_union(
-                    *[entry["outputs"] for entry in inspect_entries]
-                ),
-                "planningOnly": True,
-            }
-        )
-
     if request["knowledge"]["search"]:
         phases.append(
             {
                 "id": "retrieve-private-evidence",
-                "objective": "Search focused verified or promoted private evidence",
+                "objective": (
+                    "Resolve focused evidence into one hash-bound full recipe "
+                    "before broad project reads"
+                ),
                 "capabilities": ["knowledge-learning.search"],
-                "references": ["knowledge-card.schema.json"],
+                "references": [
+                    "knowledge-card.schema.json",
+                    "self-learning.md",
+                    "known-path-first.md",
+                ],
                 "scripts": ["ks_knowledge.py"],
                 "gates": [
                     "explicit private cards and database roots",
                     "retrieval does not authorize execution",
                 ],
-                "outputs": ["bounded scope- and version-filtered evidence"],
+                "outputs": [
+                    "bounded scope- and version-filtered matches",
+                    "one hash-bound full recipe with compatibility requirements",
+                ],
+                "planningOnly": True,
+            }
+        )
+
+    if read_entries:
+        phases.append(
+            {
+                "id": "read-current-state",
+                "objective": (
+                    "Check only the live target, dependencies, and preconditions "
+                    "needed by the selected route"
+                ),
+                "capabilities": [
+                    f"{entry['id']}.{entry['operation']}"
+                    for entry in read_entries
+                ],
+                "references": _resource_union(
+                    *[entry["references"] for entry in read_entries]
+                ),
+                "scripts": _resource_union(
+                    *[entry["scripts"] for entry in read_entries]
+                ),
+                "gates": ["project-scoped read-only"],
+                "outputs": _resource_union(
+                    *[entry["outputs"] for entry in read_entries]
+                ),
                 "planningOnly": True,
             }
         )
@@ -723,7 +761,13 @@ def build_plan(
         )
 
     for entry in direct_entries:
-        if entry["operation"] == "inspect":
+        if entry["operation"] in NARROW_READ_OPERATIONS:
+            continue
+        if (
+            entry["id"] == "knowledge-learning"
+            and entry["operation"] == "search"
+            and request["knowledge"]["search"]
+        ):
             continue
         operation_gate, operation_references, operation_scripts = _gate_resources(
             index, entry["risk"]
@@ -830,6 +874,9 @@ def build_plan(
             "statuses": ["verified", "promoted"],
             "perPassResultLimit": 5,
             "additionalFocusedPassesAllowed": True,
+            "retrievalBeforeBroadRead": request["knowledge"]["search"],
+            "fullCardHashBound": request["knowledge"]["search"],
+            "requiresLiveCompatibilityCheck": request["knowledge"]["search"],
             "authorizesExecution": False,
         },
         "safety": {

@@ -41,8 +41,8 @@
           "browser-diagnostics"
         ],
         "phaseIds": [
-          "read-current-state",
           "retrieve-private-evidence",
+          "read-current-state",
           "cross-area-synthesis",
           "approval-boundary",
           "prepare-integrations-run",
@@ -51,8 +51,8 @@
       }
     },
     {
-      "id": "dashboard-project-change",
-      "purpose": "Prepare one known dashboard change with read-before and browser proof.",
+      "id": "dashboard-coordinated-change",
+      "purpose": "Prepare a dashboard change that explicitly needs a coordinated audit trail.",
       "request": {
         "format": "teamvalue.ks-capability-request",
         "formatVersion": "1.0",
@@ -158,8 +158,8 @@
         "directCapabilities": ["course-reconstruction.build"],
         "includedAreas": ["environment-project", "course-reconstruction"],
         "phaseIds": [
-          "read-current-state",
           "retrieve-private-evidence",
+          "read-current-state",
           "cross-area-synthesis",
           "approval-boundary",
           "prepare-course-reconstruction-build",

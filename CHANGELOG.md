@@ -7,6 +7,20 @@ part of this changelog or repository.
 Release tags use Semantic Versioning. Local development builds may append a
 single `+codex.<cachebuster>` identifier without changing the release line.
 
+## [0.5.1] - 2026-09-07
+
+### Changed
+
+- Publish the portable known-path-first workflow: exact cards and compatible
+  patterns precede discovery, with bounded Mechanical Direct changes and one
+  writer for coordinated work.
+- Resolve full knowledge cards by ID and SHA-256 or inspect a supplied card;
+  `search --ready-only` filters reuse blockers before selecting the top results.
+- Report Mechanical read-budget overruns without a stated reason separately
+  from safety-policy violations; routine tasks need no persisted trace.
+- Clarify the bundled-client Mechanical route and avoid handoffs for ordinary
+  Direct continuation, including approval replies in the same task.
+
 ## [0.5.0] - 2026-08-21
 
 ### Added
@@ -80,6 +94,7 @@ single `+codex.<cachebuster>` identifier without changing the release line.
 - Portable KS backup to Diagramm JSON round-trip tooling.
 - Safe restore/read-back guidance and expanded Russian documentation.
 
+[0.5.1]: https://github.com/seroja01ajores/knowledge-space-codex-toolkit/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/seroja01ajores/knowledge-space-codex-toolkit/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/seroja01ajores/knowledge-space-codex-toolkit/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/seroja01ajores/knowledge-space-codex-toolkit/releases/tag/v0.3.0

@@ -28,8 +28,8 @@ class V050ReleaseContractTests(unittest.TestCase):
             )
         )
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertEqual(manifest["version"], "0.5.0")
-        self.assertEqual(readme.count("--ref v0.5.0"), 2)
+        self.assertEqual(manifest["version"], "0.5.1")
+        self.assertEqual(readme.count("--ref v0.5.1"), 2)
         self.assertIn("docs/release-0.5.md", readme)
         self.assertTrue((REPO_ROOT / "CHANGELOG.md").is_file())
         self.assertTrue((REPO_ROOT / "docs" / "release-0.5.md").is_file())
@@ -80,6 +80,9 @@ class V050ReleaseContractTests(unittest.TestCase):
             "self-learning.md",
             "execution-receipts.md",
             "use-case-patterns.md",
+            "known-path-first.md",
+            "mechanical-fast-path.md",
+            "subagent-orchestration.md",
         ):
             with self.subTest(resource=resource):
                 self.assertIn(resource, skill)
@@ -91,6 +94,7 @@ class V050ReleaseContractTests(unittest.TestCase):
             "ks_task_handoff.py",
             "ks_knowledge.py",
             "ks_execution_receipt.py",
+            "ks_workflow_trace.py",
         )
         sources: dict[str, str] = {}
         for name in names:

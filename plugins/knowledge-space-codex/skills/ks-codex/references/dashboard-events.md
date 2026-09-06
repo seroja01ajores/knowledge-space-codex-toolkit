@@ -291,7 +291,10 @@ For button rows, reserve enough height for the configured button pixel height pl
 
 ## API-Only Layout Repair
 
-Use this sequence when fixing a dashboard without relying on the browser editor:
+Use this sequence for layout, multi-cell, ambiguous, or broader dashboard
+repairs without relying on the browser editor. For one deterministic button,
+label, event, or rectangle change, use `mechanical-fast-path.md` and expand to
+this sequence only if a dependency or verification signal requires it.
 
 1. Read the dashboard with `POST /dashboards/get-by-id`.
 2. Unwrap the response from `dashboard`; some endpoints return HTTP 200 with `{"error": ...}`, which must fail the run.
@@ -304,7 +307,11 @@ Use this sequence when fixing a dashboard without relying on the browser editor:
    - nested switch buttons use `sendEntity` and point at the target dashboards;
    - nested dashboard cells listen with `getDashboard/place`;
    - modal buttons or Gantt controls use `getDashboard/modal` or the deliberately chosen `showDashboard` fallback.
-7. Regenerate an offline cell report and diff against the reference or previous snapshot.
+7. Regenerate an offline cell report and diff against the reference or previous
+   snapshot for layout, multi-cell, ambiguous, or unexpected changes. In the
+   Mechanical Fast Path, an exact target read-back plus a canonical comparison
+   proving non-target state unchanged is sufficient; generate the full report
+   if that comparison fails or residual layout risk remains.
 
 When converting a broken nested interface switch, do not leave a hidden `1x1` dashboard cell as a placeholder. Use one visible nested `dashboard` cell for the placement area, make the switch buttons emit `sendEntity` with the target dashboard UUID, and make the nested cell listen for `getDashboard`/`place` from the button cell.
 

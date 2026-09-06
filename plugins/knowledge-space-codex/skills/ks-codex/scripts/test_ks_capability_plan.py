@@ -58,6 +58,7 @@ class CapabilityPlanTests(unittest.TestCase):
                     item["id"] for item in plan["capabilities"]
                 }
                 phase_ids = {phase["id"] for phase in plan["phases"]}
+                ordered_phase_ids = [phase["id"] for phase in plan["phases"]]
 
                 self.assertSetEqual(
                     direct,
@@ -69,6 +70,11 @@ class CapabilityPlanTests(unittest.TestCase):
                 self.assertTrue(
                     set(expected["phaseIds"]).issubset(phase_ids)
                 )
+                expected_positions = [
+                    ordered_phase_ids.index(phase_id)
+                    for phase_id in expected["phaseIds"]
+                ]
+                self.assertEqual(expected_positions, sorted(expected_positions))
                 self.assertEqual(
                     plan["safety"]["effectiveRisk"],
                     expected["effectiveRisk"],
@@ -128,16 +134,46 @@ class CapabilityPlanTests(unittest.TestCase):
                     item["id"]
                     for item in by_id[selected["id"]]["operations"]
                 }
-                if selected["operation"] == "inspect" or "inspect" not in operations:
+                read_operation = next(
+                    (
+                        candidate
+                        for candidate in planner.NARROW_READ_OPERATIONS
+                        if candidate in operations
+                    ),
+                    None,
+                )
+                if (
+                    selected["operation"] in planner.NARROW_READ_OPERATIONS
+                    or read_operation is None
+                ):
                     continue
                 with self.subTest(
                     case=case["id"],
                     capability=selected["id"],
                 ):
                     self.assertEqual(
-                        selections[(selected["id"], "inspect")],
+                        selections[(selected["id"], read_operation)],
                         "read-before",
                     )
+
+    def test_coordinated_dashboard_change_uses_target_reads_not_broad_audit(self) -> None:
+        case = next(
+            item
+            for item in self.corpus["cases"]
+            if item["id"] == "dashboard-coordinated-change"
+        )
+        request = self._load_request(case["request"])
+        plan = planner.build_plan(request, self.index)
+        read_phase = next(
+            phase for phase in plan["phases"] if phase["id"] == "read-current-state"
+        )
+        self.assertIn("environment-project.bind", read_phase["capabilities"])
+        self.assertIn("dashboard-ui.read-target", read_phase["capabilities"])
+        self.assertNotIn("environment-project.inspect", read_phase["capabilities"])
+        self.assertNotIn("dashboard-ui.inspect", read_phase["capabilities"])
+        self.assertNotIn("ks_smoke_check.py", read_phase["scripts"])
+        self.assertNotIn("ks_readonly_audit_runner.py", read_phase["scripts"])
+        self.assertNotIn("ks_dashboard_cell_report.py", read_phase["scripts"])
 
     def test_non_read_scenarios_have_an_approval_boundary(self) -> None:
         for case in self.corpus["cases"]:
@@ -148,6 +184,82 @@ class CapabilityPlanTests(unittest.TestCase):
             phase_ids = {phase["id"] for phase in plan["phases"]}
             with self.subTest(case=case["id"]):
                 self.assertIn("approval-boundary", phase_ids)
+
+    def test_private_evidence_precedes_live_state_reads(self) -> None:
+        for case in self.corpus["cases"]:
+            if not case["request"].get("knowledge", {}).get("search"):
+                continue
+            request = self._load_request(case["request"])
+            plan = planner.build_plan(request, self.index)
+            phase_ids = [phase["id"] for phase in plan["phases"]]
+            if "read-current-state" not in phase_ids:
+                continue
+            with self.subTest(case=case["id"]):
+                self.assertLess(
+                    phase_ids.index("retrieve-private-evidence"),
+                    phase_ids.index("read-current-state"),
+                )
+                retrieval = next(
+                    phase
+                    for phase in plan["phases"]
+                    if phase["id"] == "retrieve-private-evidence"
+                )
+                self.assertIn("self-learning.md", retrieval["references"])
+                self.assertIn("known-path-first.md", retrieval["references"])
+                self.assertTrue(
+                    any("hash-bound full recipe" in item for item in retrieval["outputs"])
+                )
+
+    def test_knowledge_search_is_read_only_and_has_no_approval_boundary(self) -> None:
+        request = self._load_request(
+            {
+                "format": "teamvalue.ks-capability-request",
+                "formatVersion": "1.0",
+                "mode": "coordinated",
+                "phase": "analysis",
+                "capabilities": [
+                    {"id": "knowledge-learning", "operation": "search"}
+                ],
+                "verification": [],
+                "knowledge": {
+                    "search": True,
+                    "captureCandidate": False,
+                },
+            }
+        )
+        plan = planner.build_plan(request, self.index)
+        phase_ids = [phase["id"] for phase in plan["phases"]]
+        self.assertEqual(plan["safety"]["effectiveRisk"], "read_only")
+        self.assertEqual(phase_ids.count("retrieve-private-evidence"), 1)
+        self.assertNotIn("approval-boundary", phase_ids)
+        self.assertNotIn("prepare-knowledge-learning-search", phase_ids)
+        self.assertTrue(plan["knowledge"]["retrievalBeforeBroadRead"])
+        self.assertTrue(plan["knowledge"]["fullCardHashBound"])
+        self.assertFalse(plan["knowledge"]["authorizesExecution"])
+
+    def test_knowledge_search_does_not_raise_a_read_only_plan_to_write_risk(self) -> None:
+        request = self._load_request(
+            {
+                "format": "teamvalue.ks-capability-request",
+                "formatVersion": "1.0",
+                "mode": "coordinated",
+                "phase": "analysis",
+                "capabilities": [
+                    {"id": "dashboard-ui", "operation": "inspect"}
+                ],
+                "verification": ["api-readback"],
+                "knowledge": {
+                    "search": True,
+                    "captureCandidate": False,
+                },
+            }
+        )
+        plan = planner.build_plan(request, self.index)
+        self.assertEqual(plan["safety"]["effectiveRisk"], "read_only")
+        self.assertNotIn(
+            "approval-boundary",
+            {phase["id"] for phase in plan["phases"]},
+        )
 
     def test_multi_area_plan_has_no_numeric_area_cap(self) -> None:
         case = next(

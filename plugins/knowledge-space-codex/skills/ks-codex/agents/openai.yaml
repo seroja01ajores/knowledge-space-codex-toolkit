@@ -1,6 +1,6 @@
 interface:
   display_name: "KS Codex"
   short_description: "Safely inspect, build, repair, and verify KS projects"
-  default_prompt: "Use $ks-codex to inspect, build, repair, or verify this Knowledge Space task through the official API; choose Direct, Coordinated, or Discovery as needed, preserve project scope, and state every browser or live-verification boundary."
+  default_prompt: "Use $ks-codex to solve this Knowledge Space task through the official API: reuse an exact compatible card or pattern before Discovery, take Mechanical Direct when eligible, preserve one writer and every approval gate, and state API and browser evidence boundaries."
 policy:
   allow_implicit_invocation: true

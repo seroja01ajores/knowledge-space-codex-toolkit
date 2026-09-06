@@ -9,14 +9,15 @@ accessed and not permission to execute an operation.
 Codex should retain awareness of the complete KS task while loading only the
 detailed material needed for the active phase. The task may involve one area,
 any number of dependent areas, or a capability that is not yet represented.
-Unknown work starts with Discovery rather than a guessed keyword route. Proven
-experience can be reused through a private evidence lifecycle without making
+Known compatible routes are checked before Discovery. Proven experience can be
+reused through a private evidence lifecycle without making
 private data public or allowing retrieved knowledge to grant permission.
 
 ## Required v0.5 capabilities
 
 | Requirement | Authoritative artifact | Required proof |
 | --- | --- | --- |
+| Known-route reuse | Knowledge retrieval and Mechanical Fast Path | A ready recipe is found beyond blocked search matches; excess Mechanical reads produce efficiency warnings without weakening safety gates |
 | No numeric domain limit | Capability request and task-plan schemas | A synthetic plan with at least six directly selected areas remains valid |
 | Phase-scoped context | Adaptive context pack | Only active-phase resources are detailed; every included resource and plan has a SHA-256 binding |
 | Unknown-task support | Discovery capability and use-case contract | Unknown entity/effect remains read-only and produces a compact gap plus next safe probe |
@@ -53,10 +54,11 @@ test identities. Do not use production customer data.
 
 | Scenario | Minimum evidence |
 | --- | --- |
-| Direct read-only inspection | UUID-bound API result and normalized snapshot |
+| Direct read-only inspection | UUID-bound result from the exact target |
 | Coordinated multi-area diagnosis | Phase plan, context pack and source-linked causal chain |
 | Unknown capability | Discovery gap, observed endpoint/payload and explicit safety classification |
-| Narrow project write | Lint, exact approval, read-before, write response, machine read-back and receipt |
+| Mechanical project write | Exact scope and approval, micro dry-run, target read, one write and machine read-back; material browser behavior checked separately |
+| Planned project write | Lint, exact approval, read-before, write response, machine read-back and receipt |
 | Runtime action | Exact runtime approval, target binding, external result or documented verification waiver |
 | Browser-only interface behavior | API state plus DOM, console and network evidence |
 | Iframe session isolation | Two independent sessions with non-overwriting requests and responses |

@@ -53,21 +53,44 @@ Prefer `requests.Session()` or a reusable client wrapper. Redact tokens and pass
 
 For new Python automation scripts, prefer the bundled `scripts/ks_api_client.py` helper for login, headers, project scoping, response unwrapping, JSON `error` handling, and redacted diagnostics.
 
-## Recommended Workflow
+## Required Decision Order
 
-1. Identify the target project and confirm `KS_PROJECT_UUID`.
-2. Read the project structure: models, datasets, classes, indicators, dictionaries, objects.
-3. Read UI artifacts: data tables, dashboards, dashboard tree nodes, publication tree, Gantt charts if relevant.
-   For a standard safe baseline, run `scripts/ks_readonly_audit_runner.py` against an existing `snapshot.json` or with `KS_BASE_URL`, `KS_LOGIN`, `KS_PASSWORD`, and `KS_PROJECT_UUID` set; it creates a read-only snapshot and bundled dashboard/table/BPMS/integration reports.
-4. Compare actual state with the user request, course file, or target spec.
-5. Separate findings into:
-   - missing model/data entities;
-   - missing values;
-   - wrong dashboard events;
-   - wrong table constructor settings;
-   - publication/access problems;
-   - frontend-only verification gaps.
-6. Make small project-scoped API writes.
+Use known compatible evidence before broad stand discovery:
+
+1. Bind only the stand, project, named target, intended outcome, and expected
+   effect needed to search safely. Do not inventory the project yet.
+2. Check, in order, the exact user-supplied portable card, fresh private
+   `verified` or `promoted` cards, a bundled deterministic pattern/helper, and
+   an exact working same-project analogue.
+3. Resolve one full recipe and perform the smallest compatibility check for KS
+   version, endpoint family, target UUID, direct dependencies, preconditions,
+   expected delta, and safety gate.
+4. If compatible, execute through Direct or Coordinated mode and verify. If
+   uncertain, perform one targeted read. If incompatible, record the reason
+   and run one refined known-path search.
+5. Enter Discovery only after known paths are absent, exhausted, or contradicted.
+   Missing network, credentials, or approval is a pause boundary, not a reason
+   to invent another solution.
+6. Expand from target reads to area or full-project audit only on a material
+   risk signal or an explicit user request. A full audit remains available; it
+   is not the automatic first or final step for every narrow repair.
+
+Read `references/known-path-first.md` when a portable/private card is present,
+when choosing between a known route and Discovery, or when deciding how far to
+expand an audit.
+
+## Execution Workflow
+
+1. Identify the target project and confirm `KS_PROJECT_UUID` without reading
+   unrelated project state.
+2. Select and compatibility-check the known route using the decision order
+   above.
+3. Choose the operating mode. For an eligible deterministic one-entity change,
+   use the Mechanical Fast Path in `references/mechanical-fast-path.md`.
+4. Read the exact target and only the dependencies named by the selected route.
+   Use `scripts/ks_readonly_audit_runner.py` for an explicit baseline/audit or
+   after evidence justifies broader inspection, not as a mandatory prelude.
+5. Make small project-scoped API writes.
    For JSON safe patch plans, run `scripts/ks_safe_patch_lint.py` first. Use `scripts/ks_safe_patch_execute.py` only for read-only calls and approved `project_write` operations; runtime/destructive/server actions are not banned, but require a separate exact-approved runtime/destructive/server flow.
    For intentional integration runs, connection checks, integration-table refresh/export/update, BPMS start/complete, or recalculation, use `scripts/ks_approved_runtime_execute.py` with `metadata.mode=approved_runtime`, exact operation approval, target project verification, and read-back/verification or an explicit verification waiver.
    After either executor writes its JSON report, use
@@ -78,8 +101,13 @@ For new Python automation scripts, prefer the bundled `scripts/ks_api_client.py`
    `KS_RUNTIME_PAYLOAD_*` environment variables declared by exact payload path;
    never reuse `KS_TOKEN`, `KS_PASSWORD`, SSH, cloud, or source-control
    credentials as operation payloads.
-7. Verify through API.
-8. Verify high-risk UI paths in a browser when available, especially after dashboard, Gantt, modal, widget, or publication changes.
+6. Verify the expected delta through API and confirm non-target state relevant
+   to a full-object payload is unchanged.
+7. Verify material UI behavior in a browser when available, especially after
+   dashboard, Gantt, modal, widget, or publication changes.
+8. Broaden the audit only when verification, dependency resolution, effect
+   classification, or residual risk supplies a concrete reason. Prepare a
+   private candidate card only after a genuinely novel route is verified.
 
 When browser access is unavailable, still build and audit through API, but mark visual behavior as unverified. Do not call a user-facing interface complete only because JSON references are present.
 
@@ -90,11 +118,13 @@ Select any number of areas required by entities, effects, dependencies, safety,
 and verification. The planner already has no numeric area limit; never truncate
 a real dependency chain to fit an arbitrary count.
 
-- **Direct**: entities and outcome are clear; work without a capability plan.
+- **Direct**: entities, outcome, known route, and effect are clear; work without
+  a capability plan. Use the Mechanical Fast Path for one deterministic entity.
 - **Coordinated**: dependent phases, approvals, handoff, resume, or audit trail;
   keep a structured plan and load details per phase.
-- **Discovery**: no matching section or uncertain entity/effect; gather minimal
-  read-only evidence, then switch to Direct or Coordinated.
+- **Discovery**: known routes are exhausted or contradicted and the actual
+  entity/effect remains uncertain; gather minimal read-only evidence, then
+  switch to Direct or Coordinated.
 
 For every mode, load only current-phase detail, but add every reference actually
 needed. Reduce completed evidence to UUID-bound facts, unknowns, approvals,
@@ -110,18 +140,39 @@ current phase. The result contains only resource paths, hashes, gates, expected
 outputs, and handoff policy; it embeds no reference or script content and never
 authorizes execution. Read `references/adaptive-context-packs.md` for the
 contract and resume flow.
-For work resumed in another task or after an approval boundary, use
+For Coordinated work transferred to another task or resumed without the needed
+working context, use
 `scripts/ks_task_handoff.py` and read `references/task-handoff.md`. Keep the
 handoff outside the plugin; it carries reduced evidence and lineage, not raw
-responses or permission.
+responses or permission. Ordinary Direct continuation in the same task,
+including an approval reply, does not require a handoff.
 
-For Discovery, inspect API maps/OpenAPI first, then redacted official UI
+For Discovery, first record why the supplied/retrieved/bundled known paths were
+not applicable. Then inspect API maps/OpenAPI, followed by redacted official UI
 network evidence. Use read-only server/DB diagnostics only when API/UI is
 insufficient and policy permits it. Record a capability gap or candidate card
 after solving; discovery never inherits non-read permission. For a Coordinated
 unknown task, select one or more `capability-discovery` operations alongside
 every already-known area involved; this is a fallback evidence workflow, not a
 natural-language router.
+
+## Subagent Use
+
+Do not spawn subagents for a normal Mechanical Fast Path. For Coordinated or
+Discovery work, delegate only independent read-only checks that materially save
+time, after one route and boundary are selected. Assign exactly one
+`writer_owner`; every other agent is `no_write`. Readers never mutate KS, run
+integrations/BPMS/recalculation, or perform active UI clicks with business
+effects. Use a probe ledger to prevent duplicate investigations and stop
+unneeded probes when a route is confirmed.
+
+Read `references/subagent-orchestration.md` before delegating KS work. Its
+single-writer rule does not replace the existing safe patch, runtime,
+destructive, or server approval gates.
+Use `scripts/ks_workflow_trace.py` only for regression testing or a
+high-assurance handoff. It validates routing, bindings, audit escalation, and
+writer/delegation policy offline; it neither proves task completion nor grants
+permission.
 
 Read references/use-case-patterns.md only when the request is unfamiliar,
 product-shaped, ambiguous between modes, or involves cross-area state,
@@ -135,6 +186,9 @@ This is the full surface overview; operation details stay in
 
 | Area | Load on demand |
 | --- | --- |
+| Known path / audit depth | `known-path-first.md` |
+| Mechanical Direct changes | `mechanical-fast-path.md`, then the exact area reference |
+| Coordinated subagents | `subagent-orchestration.md` |
 | Environment/API | `api-client-patterns.md`, `api-map.md`, `openapi-endpoints.md` |
 | Models/data | `project-audit.md`, `api-map.md`, `ui-observed-builder.md` |
 | Indicators/formulas | `api-map.md`, `payload-examples.md`, version field notes |
@@ -175,13 +229,21 @@ KS.
 
 For retrieval:
 
-1. Query with discovered entities, endpoint families, KS version, symptom, and
-   intended effect rather than only the user's original wording.
-2. Start with one focused pass of up to five `verified` or `promoted` cards.
-   If an evidence gap remains, run another narrower pass; five is a per-pass
-   context bound, not a limit on the task's knowledge.
-3. Treat matches as evidence. Re-check UUIDs, dependencies, live state, and
-   version compatibility. Retrieval never grants permission.
+1. If the user supplies a portable card, use `inspect-card` on that exact file
+   first. Otherwise query early from the requested outcome, symptom, named
+   entity, likely capability, and intended effect; do not wait for a project
+   inventory.
+2. Start with one focused `search --ready-only` pass of up to five `verified`
+   or `promoted` cards, adding known version/scope filters. It returns compact
+   matches; use `get-card` with the selected ID and
+   returned SHA-256 to load exactly one full recipe.
+3. Check freshness, portable scope when moving across stands, KS version,
+   endpoint family, target and dependency UUIDs, preconditions, and actual
+   effect. Retrieval never grants permission.
+4. If the first route is incompatible or ambiguous, make one narrower pass
+   using the observed mismatch. Additional focused passes are allowed when new
+   evidence warrants them; five is a per-pass context bound, not a task-wide
+   knowledge limit.
 
 For learning from unfamiliar or corrected work:
 

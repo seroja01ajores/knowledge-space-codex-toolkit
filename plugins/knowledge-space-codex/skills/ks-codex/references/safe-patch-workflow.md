@@ -2,6 +2,9 @@
 
 Use this workflow before API writes, broad repairs, generated patch batches, integration/BPMS edits, access changes, imports, or any action learned from UI/API captures.
 
+For eligible Mechanical Direct changes, use the shorter `mechanical-fast-path.md`
+route under the same effect and approval guardrails; a JSON plan is not required.
+
 Safe patch is not a hard ban on integrations, BPMS, deletes, imports, or other advanced KS features. It is a staged risk gate that lets the agent learn and plan any operation, while preventing accidental execution against the wrong project, wrong stand, external systems, or server/global state.
 
 ## Modes

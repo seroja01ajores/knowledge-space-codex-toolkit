@@ -1,0 +1,1570 @@
+{
+  "format": "teamvalue.ks-workflow-trace-scenarios",
+  "formatVersion": "1.2",
+  "traceDefaults": {
+    "format": "teamvalue.ks-workflow-trace",
+    "formatVersion": "1.2",
+    "coordinatorOwner": "coordinator",
+    "suppliedCard": null
+  },
+  "cases": [
+    {
+      "id": "supplied-card-mechanical-direct",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-close", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 4, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 5, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "button-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 7, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "button-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 8, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "button-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 9, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "button-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 10, "actor": "coordinator", "action": "browser.verify", "result": "ok"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "bundled-pattern-mechanical-direct",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "label-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "label-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "label-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "label-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "broad-read-before-known-path",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "unknown-route", "operationId": "inspect", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_resolved_after_broad_read"]}
+    },
+    {
+      "id": "mechanical-unjustified-full-audit",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "audit.full", "result": "ok", "projectRef": "project-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["audit_in_direct_mode", "full_audit_without_cross_area_signal", "mechanical_direct_used_full_audit"]}
+    },
+    {
+      "id": "mismatch-refined-then-discovery",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-legacy", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-legacy", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-legacy", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 4, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 5, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "card-legacy", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "projectRef": "project-a", "targetRef": "dashboard-a", "signal": "route-mismatch"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 7, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 8, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 9, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "premature-discovery",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index"},
+          {"step": 3, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_before_known_path_exhausted"]}
+    },
+    {
+      "id": "parallel-readers-single-writer",
+      "trace": {
+        "taskClass": "cross-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "probeKey": "project-a-dashboard-a-events", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 6, "actor": "reader-a", "action": "dependency.read", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "probeKey": "project-a-dashboard-a-events", "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read"},
+          {"step": 7, "actor": "coordinator", "action": "probe.reconcile", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "probeKey": "project-a-dashboard-a-events", "endpointFamily": "dependencies.read", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 8, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-b", "allowedAction": "dependency.read", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "probeKey": "project-a-dashboard-a-publication", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 9, "actor": "reader-b", "action": "dependency.read", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "probeKey": "project-a-dashboard-a-publication", "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read"},
+          {"step": 10, "actor": "coordinator", "action": "probe.reconcile", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "probeKey": "project-a-dashboard-a-publication", "endpointFamily": "dependencies.read", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 11, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "operationId": "cross-area-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 12, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "operationId": "cross-area-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 13, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "operationId": "cross-area-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 14, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "card-cross-area", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "operationId": "cross-area-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "duplicate-probe-key",
+      "trace": {
+        "taskClass": "cross-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-cross"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-cross", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "pattern-cross", "probeKey": "same-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 5, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-b", "allowedAction": "dependency.read", "candidateRef": "pattern-cross", "probeKey": "same-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["duplicate_probe_key"]}
+    },
+    {
+      "id": "direct-mode-delegation",
+      "trace": {
+        "taskClass": "single-area", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "pattern-close", "probeKey": "unneeded-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["direct_mode_delegated"]}
+    },
+    {
+      "id": "two-writers",
+      "trace": {
+        "taskClass": "cross-area", "mode": "coordinated", "writerOwner": "writer-a", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-cross"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-cross", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "writer-a", "action": "target.read", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-a", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id", "endpointFamily": "dashboards.read"},
+          {"step": 5, "actor": "writer-a", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-a", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "writer-a", "action": "project.write", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-a", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "writer-a", "action": "target.readback", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-a", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "writer-b", "action": "target.read", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-b", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id", "endpointFamily": "dashboards.read"},
+          {"step": 9, "actor": "writer-b", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-b", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 10, "actor": "writer-b", "action": "project.write", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-b", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 11, "actor": "writer-b", "action": "target.readback", "result": "ok", "candidateRef": "pattern-cross", "operationId": "change-b", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["multiple_writers", "reader_without_successful_delegation", "dry_run_owner_mismatch", "reader_without_successful_delegation", "reader_without_successful_delegation", "writer_owner_mismatch", "reader_without_successful_delegation"]}
+    },
+    {
+      "id": "runtime-with-exact-approval",
+      "trace": {
+        "taskClass": "runtime", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-runtime"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-runtime", "projectRef": "project-a", "targetRef": "integration-a"},
+          {"step": 4, "actor": "coordinator", "action": "approval.runtime", "result": "approved", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "runtime.execute", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "runtime.verify", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "runtime-with-mismatched-approval",
+      "trace": {
+        "taskClass": "runtime", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-runtime"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-runtime", "projectRef": "project-a", "targetRef": "integration-a"},
+          {"step": 4, "actor": "coordinator", "action": "approval.runtime", "result": "approved", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-b", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "runtime.execute", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "runtime.verify", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["runtime_approval_missing_or_mismatched"]}
+    },
+    {
+      "id": "runtime-with-explicit-verification-waiver",
+      "trace": {
+        "taskClass": "runtime", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-runtime"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-runtime", "projectRef": "project-a", "targetRef": "integration-a"},
+          {"step": 4, "actor": "coordinator", "action": "approval.runtime", "result": "approved", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "verification.waiver", "result": "approved", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "signal": "no-readback-endpoint"},
+          {"step": 6, "actor": "coordinator", "action": "runtime.execute", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "runtime-without-verification",
+      "trace": {
+        "taskClass": "runtime", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-runtime"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-runtime", "projectRef": "project-a", "targetRef": "integration-a"},
+          {"step": 4, "actor": "coordinator", "action": "approval.runtime", "result": "approved", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "runtime.execute", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["runtime_verification_missing"]}
+    },
+    {
+      "id": "mechanical-class-cannot-run-runtime",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-runtime"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-runtime", "projectRef": "project-a", "targetRef": "integration-a"},
+          {"step": 4, "actor": "coordinator", "action": "approval.runtime", "result": "approved", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "runtime.execute", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "runtime.verify", "result": "ok", "candidateRef": "pattern-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "integration-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["mechanical_forbids_runtime"]}
+    },
+    {
+      "id": "full-audit-after-cross-area-risk",
+      "trace": {
+        "taskClass": "cross-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-cross", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-cross", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-cross", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "risk.signal", "result": "ok", "signal": "unexpected-cross-area-diff", "riskScope": "cross-area", "projectRef": "project-a", "areaRef": "dashboard+publication"},
+          {"step": 6, "actor": "coordinator", "action": "audit.full", "result": "ok", "projectRef": "project-a"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "explicit-full-audit",
+      "trace": {
+        "taskClass": "cross-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": {"scope": "full", "projectRef": "project-a"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "project-a"},
+          {"step": 2, "actor": "coordinator", "action": "audit.full", "result": "ok", "projectRef": "project-a"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "area-request-does-not-authorize-full",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": {"scope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "audit.full", "result": "ok", "projectRef": "project-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["full_audit_without_cross_area_signal"]}
+    },
+    {
+      "id": "discovery-cannot-write-before-mode-switch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "project-analogue", "candidateRef": "discovered-route"},
+          {"step": 7, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 8, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "discovered-route", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 9, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 10, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 11, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 12, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["mutation_while_in_discovery"]}
+    },
+    {
+      "id": "discovery-switches-to-coordinated-before-write",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "project-analogue", "candidateRef": "discovered-route"},
+          {"step": 7, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 8, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "discovered-route", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 9, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "coordinated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 10, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 11, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 12, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 13, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "discovered-route", "operationId": "discovered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "discovery-action-hidden-in-coordinated",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_action_outside_discovery"]}
+    },
+    {
+      "id": "failed-read-before-write",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "failed", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_bound_dry_run", "project_write_without_successful_bound_read"]}
+    },
+    {
+      "id": "failed-readback",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "failed", "candidateRef": "pattern-close", "operationId": "change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_successful_bound_readback"]}
+    },
+    {
+      "id": "mechanical-second-write",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["mechanical_multiple_mutations"]}
+    },
+    {
+      "id": "one-read-two-writes",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 9, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 10, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "change-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_bound_dry_run", "project_write_without_successful_bound_read"]}
+    },
+    {
+      "id": "audit-then-mutation-without-known-path",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": {"scope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "audit.area", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 2, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "unknown-route", "operationId": "repair-after-audit", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 3, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "unknown-route", "operationId": "repair-after-audit", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 4, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "unknown-route", "operationId": "repair-after-audit", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "unknown-route", "operationId": "repair-after-audit", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_resolution_missing", "mutation_before_compatibility", "mutation_before_known_path_resolution", "project_write_without_successful_bound_read"]}
+    },
+    {
+      "id": "delegation-before-route-decision",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index"},
+          {"step": 3, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "discovery-route", "probeKey": "premature-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["delegation_before_route_decision"]}
+    },
+    {
+      "id": "failed-delegation-does-not-authorize-reader",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "failed", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "pattern-close", "probeKey": "failed-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 5, "actor": "reader-a", "action": "dependency.read", "result": "ok", "probeKey": "failed-probe", "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["reader_without_successful_delegation"]}
+    },
+    {
+      "id": "blocked-precondition-stops-without-discovery",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-close", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "blocked", "projectRef": "project-a", "signal": "credentials-unavailable"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "area-audit-after-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "audit.area", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["area_audit_without_signal"]}
+    },
+    {
+      "id": "supplied-card-cannot-be-skipped",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-close", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["supplied_card_not_checked_first"]}
+    },
+    {
+      "id": "failed-resolution-cannot-pass-compatibility",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "failed", "source": "bundled-pattern"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["compatibility_without_successful_resolution"]}
+    },
+    {
+      "id": "successful-route-needs-compatibility-before-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_compatibility"]}
+    },
+    {
+      "id": "compatible-route-cannot-be-declared-exhausted",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_mismatch"]}
+    },
+    {
+      "id": "latest-mismatch-invalidates-old-compatibility",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a", "signal": "route-mismatch"},
+          {"step": 5, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 6, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 8, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "unsafe-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["mutation_before_compatibility"]}
+    },
+    {
+      "id": "compatibility-before-resolution",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 2, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["compatibility_without_successful_resolution"]}
+    },
+    {
+      "id": "private-card-requires-full-recipe",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-close", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-close", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["card_recipe_not_resolved"]}
+    },
+    {
+      "id": "cross-project-signal-cannot-authorize-full-audit",
+      "trace": {
+        "taskClass": "cross-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "risk.signal", "result": "ok", "signal": "cross-area-diff", "riskScope": "cross-area", "projectRef": "project-a", "areaRef": "dashboard+publication"},
+          {"step": 5, "actor": "coordinator", "action": "audit.full", "result": "ok", "projectRef": "project-b"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["full_audit_without_cross_area_signal"]}
+    },
+    {
+      "id": "server-readonly-requires-api-ui-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "risk.signal", "result": "ok", "signal": "api-ui-insufficient", "riskScope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+          {"step": 7, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["api_ui_insufficient_before_bound_probes", "server_readonly_before_api_ui_exhausted"]}
+    },
+    {
+      "id": "server-readonly-after-api-ui-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "risk.signal", "result": "ok", "signal": "api-ui-insufficient", "riskScope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+          {"step": 9, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "card-hash-swap-at-compatibility",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-close", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-close", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["compatibility_without_successful_resolution"]}
+    },
+    {
+      "id": "new-card-revision-invalidates-compatibility",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-close", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 6, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 7, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "stale-card-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "stale-card-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 9, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "stale-card-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 10, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "operationId": "stale-card-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_search_after_compatible_route", "candidate_revision_not_bound", "candidate_revision_not_bound", "candidate_revision_not_bound", "mutation_before_compatibility", "project_write_without_successful_bound_read", "candidate_revision_not_bound"]}
+    },
+    {
+      "id": "supplied-card-missing-inspection-before-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-close", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_compatibility", "supplied_card_not_conclusively_disposed", "supplied_card_not_inspected"]}
+    },
+    {
+      "id": "failed-refinement-does-not-exhaust",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a", "signal": "route-mismatch"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "failed", "source": "project-analogue"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_conclusive_resolution", "known_path_not_refined_after_mismatch"]}
+    },
+    {
+      "id": "failed-resolution-does-not-exhaust",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "failed", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_conclusive_resolution"]}
+    },
+    {
+      "id": "blocked-resolution-does-not-exhaust",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "blocked", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_conclusive_resolution"]}
+    },
+    {
+      "id": "unknown-resolution-does-not-exhaust",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "unknown", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_conclusive_resolution"]}
+    },
+    {
+      "id": "cross-project-discovery-transition",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-b", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_before_known_path_exhausted", "discovery_without_successful_target_bind"]}
+    },
+    {
+      "id": "cross-target-discovery-transition",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-b"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_before_known_path_exhausted", "discovery_without_successful_target_bind"]}
+    },
+    {
+      "id": "stale-exhaustion-after-compatible-route",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "project-analogue", "candidateRef": "route-new"},
+          {"step": 5, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 6, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-new", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 7, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_before_known_path_exhausted"]}
+    },
+    {
+      "id": "direct-writer-must-be-coordinator",
+      "trace": {
+        "taskClass": "single-area", "mode": "direct", "writerOwner": "writer-a", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["direct_mode_single_owner_required"]}
+    },
+    {
+      "id": "delegation-invalidated-inside-direct-epoch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "pattern-close", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 5, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "direct", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "reader-a", "action": "dependency.read", "result": "ok", "candidateRef": "pattern-close", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["direct_mode_non_coordinator_actor", "reader_without_successful_delegation"]}
+    },
+    {
+      "id": "delegation-invalidated-after-direct-epoch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "pattern-close", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 5, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "direct", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "coordinated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 7, "actor": "reader-a", "action": "dependency.read", "result": "ok", "candidateRef": "pattern-close", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["reader_without_successful_delegation"]}
+    },
+    {
+      "id": "dry-run-before-read",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "ordered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "ordered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "ordered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "ordered-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_bound_dry_run"]}
+    },
+    {
+      "id": "requested-area-cross-project",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": {"scope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "audit.area", "result": "ok", "projectRef": "project-b", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["area_audit_without_signal"]}
+    },
+    {
+      "id": "requested-area-cross-area",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": {"scope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "audit.area", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "model-formulas"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["area_audit_without_signal"]}
+    },
+    {
+      "id": "server-readonly-without-approval",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "risk.signal", "result": "ok", "signal": "api-ui-insufficient", "riskScope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["server_readonly_without_exact_approval"]}
+    },
+    {
+      "id": "delegated-card-hash-mismatch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/"},
+          {"step": 6, "actor": "reader-a", "action": "dependency.read", "result": "ok", "candidateRef": "card-close", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["candidate_revision_not_bound", "delegated_read_scope_mismatch"]}
+    },
+    {
+      "id": "delegated-read-action-mismatch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "target.read", "candidateRef": "pattern-close", "probeKey": "target-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dashboards.read", "endpointPrefix": "/dashboards/"},
+          {"step": 5, "actor": "reader-a", "action": "dependency.read", "result": "ok", "candidateRef": "pattern-close", "probeKey": "target-probe", "projectRef": "project-a", "targetRef": "dashboard-a", "endpointFamily": "dashboards.read", "endpoint": "/dashboards/read"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["reader_without_successful_delegation"]}
+    },
+    {
+      "id": "api-ui-signal-before-ui-probe",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "risk.signal", "result": "ok", "signal": "api-ui-insufficient", "riskScope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "unknown", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["api_ui_insufficient_before_bound_probes"]}
+    },
+    {
+      "id": "server-readonly-crosses-mode-epoch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "risk.signal", "result": "ok", "signal": "api-ui-insufficient", "riskScope": "area", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+          {"step": 9, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "coordinated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 10, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 11, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["server_readonly_before_api_ui_exhausted", "server_readonly_without_exact_approval"]}
+    },
+    {
+      "id": "latest-failed-read-invalidates-ok-read",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "target.read", "result": "failed", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 6, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 8, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_bound_dry_run", "project_write_without_successful_bound_read"]}
+    },
+    {
+      "id": "latest-failed-dry-run-invalidates-ok-dry-run",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "write.dry-run", "result": "failed", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 8, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_bound_dry_run"]}
+    },
+    {
+      "id": "latest-failed-readback-invalidates-ok-readback",
+      "trace": {
+        "taskClass": "mechanical", "mode": "direct", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "target.readback", "result": "failed", "candidateRef": "pattern-close", "operationId": "fresh-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_successful_bound_readback"]}
+    },
+    {
+      "id": "route-decision-must-be-coordinator-owned",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "reader-a", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "reader-a", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["route_decision_not_by_coordinator"]}
+    },
+    {
+      "id": "explicitly-inapplicable-card-can-refine",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-close", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 4, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 5, "actor": "coordinator", "action": "compatibility.check", "result": "not-found", "signal": "explicitly-inapplicable", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 7, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "card-hash-required-on-read-only-operation",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "card-close", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "card-close", "operationId": "read-only-check", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["candidate_revision_not_bound"]}
+    },
+    {
+      "id": "same-supplied-card-does-not-refine",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-legacy", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-legacy", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-legacy", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 4, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 5, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "card-legacy", "projectRef": "project-a", "targetRef": "dashboard-a", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "signal": "ks-version-mismatch"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "supplied-card", "candidateRef": "card-legacy", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 7, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["supplied_card_resolved_more_than_once", "known_path_not_refined_after_mismatch"]}
+    },
+    {
+      "id": "successful-resolution-reopens-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-new"},
+          {"step": 5, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_before_known_path_exhausted"]}
+    },
+    {
+      "id": "mismatch-reopens-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-old"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "route-old", "projectRef": "project-a", "targetRef": "dashboard-a", "signal": "target-shape-mismatch"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 7, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "route-old", "projectRef": "project-a", "targetRef": "dashboard-a", "signal": "new-stand-mismatch"},
+          {"step": 8, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_before_known_path_exhausted"]}
+    },
+    {
+      "id": "fresh-exhaustion-after-route-reopen",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-old"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "route-old", "projectRef": "project-a", "targetRef": "dashboard-a", "signal": "target-shape-mismatch"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 7, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "route-old", "projectRef": "project-a", "targetRef": "dashboard-a", "signal": "new-stand-mismatch"},
+          {"step": 8, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "project-analogue"},
+          {"step": 9, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 10, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 11, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "failed-target-bind-does-not-authorize-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "failed", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_successful_target_bind"]}
+    },
+    {
+      "id": "failed-target-bind-does-not-authorize-discovery",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.bind", "result": "blocked", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_without_successful_target_bind"]}
+    },
+    {
+      "id": "card-read-must-match-latest-resolution",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-a", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-b", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 3, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-a", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["card_read_without_current_resolution"]}
+    },
+    {
+      "id": "search-after-compatible-route",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_search_after_compatible_route"]}
+    },
+    {
+      "id": "compatible-route-reopened-by-risk",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "pattern-close"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "pattern-close", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "risk.signal", "result": "ok", "riskScope": "target", "signal": "target-read-contradiction", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "mutation-retry-with-different-endpoint",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-write"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-write", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update-v2", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update-v2", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["mutation_retried"]}
+    },
+    {
+      "id": "mutation-retry-with-different-digest",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-write"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-write", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "logical-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["mutation_retried"]}
+    },
+    {
+      "id": "latest-blocked-api-probe-does-not-escalate",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "discovery.inspect-api", "result": "blocked", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "risk.signal", "result": "ok", "riskScope": "area", "signal": "api-ui-insufficient", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 9, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+          {"step": 10, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["api_ui_insufficient_before_bound_probes", "server_readonly_before_api_ui_exhausted"]}
+    },
+    {
+      "id": "latest-failed-insufficiency-signal-does-not-escalate",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "risk.signal", "result": "ok", "riskScope": "area", "signal": "api-ui-insufficient", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "risk.signal", "result": "failed", "riskScope": "area", "signal": "api-ui-insufficient", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 9, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+          {"step": 10, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["server_readonly_before_api_ui_exhausted"]}
+    },
+    {
+      "id": "server-approval-endpoint-mismatch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "risk.signal", "result": "ok", "riskScope": "area", "signal": "api-ui-insufficient", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/other", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+          {"step": 9, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["server_readonly_without_exact_approval"]}
+    },
+    {
+      "id": "server-approval-digest-mismatch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "risk.signal", "result": "ok", "riskScope": "area", "signal": "api-ui-insufficient", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 9, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["server_readonly_without_exact_approval"]}
+    },
+    {
+      "id": "server-approval-area-mismatch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 6, "actor": "coordinator", "action": "discovery.inspect-ui-network", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 7, "actor": "coordinator", "action": "risk.signal", "result": "ok", "riskScope": "area", "signal": "api-ui-insufficient", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui"},
+          {"step": 8, "actor": "coordinator", "action": "approval.server-readonly", "result": "approved", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "integrations", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+          {"step": 9, "actor": "coordinator", "action": "discovery.inspect-server-readonly", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a", "areaRef": "dashboard-ui", "endpoint": "/server/read-only", "requestDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["server_readonly_without_exact_approval"]}
+    },
+    {
+      "id": "delegated-endpoint-family-mismatch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-delegated"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-delegated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "endpointFamily": "dependencies.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointPrefix": "/dependencies/"},
+          {"step": 5, "actor": "reader-a", "action": "dependency.read", "result": "ok", "endpointFamily": "dashboards.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dependencies/read"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["delegated_read_endpoint_family_mismatch"]}
+    },
+    {
+      "id": "delegated-evidence-requires-reconciliation",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-delegated"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-delegated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "endpointFamily": "dependencies.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a", "endpointPrefix": "/dependencies/"},
+          {"step": 5, "actor": "reader-a", "action": "dependency.read", "result": "ok", "endpointFamily": "dependencies.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dependencies/read"},
+          {"step": 6, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 7, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 8, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 9, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["delegated_evidence_not_reconciled"]}
+    },
+    {
+      "id": "runtime-verify-endpoint-mismatch",
+      "trace": {
+        "taskClass": "runtime", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-runtime"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-runtime", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "approval.runtime", "result": "approved", "candidateRef": "route-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 5, "actor": "coordinator", "action": "runtime.execute", "result": "ok", "candidateRef": "route-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/integrator/integrate", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "runtime.verify", "result": "ok", "candidateRef": "route-runtime", "operationId": "run-integration", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/integrator/status", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["runtime_verification_missing"]}
+    },
+    {
+      "id": "supplied-card-second-resolution-forbidden",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "suppliedCard": {"ref": "card-original", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "supplied-card", "candidateRef": "card-original", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 2, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-original", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 4, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "card-original", "projectRef": "project-a", "targetRef": "dashboard-a", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "signal": "ks-version-mismatch"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "supplied-card", "candidateRef": "card-alias", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["supplied_card_resolved_more_than_once"]}
+    },
+    {
+      "id": "card-alias-same-sha-does-not-refine",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-original", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-original", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 4, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 5, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "card-original", "projectRef": "project-a", "targetRef": "dashboard-a", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "signal": "stand-mismatch"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index", "candidateRef": "card-alias", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 7, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_not_refined_after_mismatch"]}
+    },
+    {
+      "id": "card-alias-new-sha-can-refine",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "private-index", "candidateRef": "card-original", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 3, "actor": "coordinator", "action": "knowledge.get-card", "result": "ok", "candidateRef": "card-original", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+          {"step": 4, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 5, "actor": "coordinator", "action": "compatibility.check", "result": "mismatch", "candidateRef": "card-original", "projectRef": "project-a", "targetRef": "dashboard-a", "candidateSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "signal": "stand-mismatch"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index", "candidateRef": "card-alias", "candidateSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+          {"step": 7, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "blocked-resolution-invalidates-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.resolve", "result": "blocked", "source": "private-index"},
+          {"step": 5, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["discovery_before_known_path_exhausted"]}
+    },
+    {
+      "id": "fresh-exhaustion-after-blocked-resolution",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.resolve", "result": "blocked", "source": "private-index"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "project-analogue"},
+          {"step": 6, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 7, "actor": "coordinator", "action": "mode.enter", "result": "ok", "toMode": "discovery", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 8, "actor": "coordinator", "action": "discovery.inspect-api", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "latest-inconclusive-lookup-prevents-exhaustion",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "target.bind", "result": "ok", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 2, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "bundled-pattern"},
+          {"step": 3, "actor": "coordinator", "action": "known-path.resolve", "result": "unknown", "source": "private-index"},
+          {"step": 4, "actor": "coordinator", "action": "known-path.exhausted", "result": "exhausted", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_exhausted_without_conclusive_resolution"]}
+    },
+    {
+      "id": "unrelated-read-failure-does-not-reopen-route",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-selected"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-selected", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "failed", "candidateRef": "route-other", "operationId": "inspect", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_search_after_compatible_route"]}
+    },
+    {
+      "id": "exact-read-failure-reopens-route",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-selected"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-selected", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "failed", "candidateRef": "route-selected", "operationId": "inspect", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "different-operation-failure-does-not-reopen-route",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-selected"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-selected", "projectRef": "project-a", "targetRef": "dashboard-a", "operationId": "operation-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "failed", "candidateRef": "route-selected", "operationId": "operation-b", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "known-path.resolve", "result": "not-found", "source": "private-index"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["known_path_search_after_compatible_route"]}
+    },
+    {
+      "id": "write-cannot-reuse-read-before-prior-mutation",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-write"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-write", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 6, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 8, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["project_write_without_successful_bound_read"]}
+    },
+    {
+      "id": "sequential-writes-use-fresh-read-after-readback",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-write"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-write", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "next-read-requires-prior-write-readback",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-write"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-write", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 5, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 6, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 7, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 8, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "operation-one", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-write", "operationId": "operation-two", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["target_read_before_prior_write_readback"]}
+    },
+    {
+      "id": "later-blocked-reconciliation-invalidates-success",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-delegated"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-delegated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "reader-a", "action": "dependency.read", "result": "ok", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "probe.reconcile", "result": "ok", "endpointFamily": "dependencies.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 7, "actor": "coordinator", "action": "probe.reconcile", "result": "blocked", "endpointFamily": "dependencies.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 8, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["delegated_evidence_not_reconciled"]}
+    },
+    {
+      "id": "later-ok-reconciliation-restores-success",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": "coordinator", "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-delegated"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-delegated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "reader-a", "action": "dependency.read", "result": "ok", "endpointFamily": "dependencies.read", "endpoint": "/dependencies/read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 6, "actor": "coordinator", "action": "probe.reconcile", "result": "blocked", "endpointFamily": "dependencies.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 7, "actor": "coordinator", "action": "probe.reconcile", "result": "ok", "endpointFamily": "dependencies.read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 8, "actor": "coordinator", "action": "target.read", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"},
+          {"step": 9, "actor": "coordinator", "action": "write.dry-run", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 10, "actor": "coordinator", "action": "project.write", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/update", "requestDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+          {"step": 11, "actor": "coordinator", "action": "target.readback", "result": "ok", "candidateRef": "route-delegated", "operationId": "delegated-change", "projectRef": "project-a", "targetRef": "dashboard-a", "endpoint": "/dashboards/get-by-id"}
+        ]
+      },
+      "expected": {"policyValid": true, "violationCodes": []}
+    },
+    {
+      "id": "delegated-endpoint-prefix-mismatch",
+      "trace": {
+        "taskClass": "single-area", "mode": "coordinated", "writerOwner": null, "requestedAuditScope": null,
+        "events": [
+          {"step": 1, "actor": "coordinator", "action": "known-path.resolve", "result": "ok", "source": "bundled-pattern", "candidateRef": "route-delegated"},
+          {"step": 2, "actor": "coordinator", "action": "stand.fingerprint", "result": "ok", "projectRef": "project-a"},
+          {"step": 3, "actor": "coordinator", "action": "compatibility.check", "result": "compatible", "candidateRef": "route-delegated", "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 4, "actor": "coordinator", "action": "delegate.read", "result": "ok", "assignee": "reader-a", "allowedAction": "dependency.read", "endpointFamily": "dependencies.read", "endpointPrefix": "/dependencies/", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "noWrite": true, "projectRef": "project-a", "targetRef": "dashboard-a"},
+          {"step": 5, "actor": "reader-a", "action": "dependency.read", "result": "ok", "endpointFamily": "dependencies.read", "endpoint": "/dashboards/read", "candidateRef": "route-delegated", "probeKey": "dependency-probe", "projectRef": "project-a", "targetRef": "dashboard-a"}
+        ]
+      },
+      "expected": {"policyValid": false, "violationCodes": ["delegated_read_endpoint_prefix_mismatch"]}
+    }
+  ]
+}
